@@ -3,17 +3,21 @@ import { useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useFormik, Form, FormikProvider } from 'formik';
 // material
-import { Link, Stack, Checkbox, TextField, IconButton, InputAdornment, FormControlLabel } from '@mui/material';
+import { Link, Stack, Checkbox, TextField, IconButton, InputAdornment, FormControlLabel, Alert } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
+
 // component
 import Iconify from '../../../components/Iconify';
 
+// API
+import { apiAdminSignin } from '../../../API/index';
 // ----------------------------------------------------------------------
 
 export default function LoginForm() {
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [openError, setOpenError] = useState(null);
 
   const LoginSchema = Yup.object().shape({
     email: Yup.string().email('Email must be a valid email address').required('Email is required'),
@@ -27,8 +31,13 @@ export default function LoginForm() {
       remember: true,
     },
     validationSchema: LoginSchema,
-    onSubmit: () => {
-      navigate('/dashboard', { replace: true });
+    onSubmit: async (credintials) => {
+      try {
+        await apiAdminSignin({ ...credintials });
+        navigate('/dashboard/app', { replace: true });
+      } catch (error) {
+        setOpenError(error.response.data.msg);
+      }
     },
   });
 
@@ -37,9 +46,19 @@ export default function LoginForm() {
   const handleShowPassword = () => {
     setShowPassword((show) => !show);
   };
-
+  const handleCloseErrorMessage = () => {
+    setOpenError(null);
+  };
   return (
     <FormikProvider value={formik}>
+      <Stack spacing={2} sx={{ width: '100%' }}>
+        {openError && (
+          <Alert onClose={handleCloseErrorMessage} severity="error">
+            {openError}!
+          </Alert>
+        )}
+        <br />
+      </Stack>
       <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
         <Stack spacing={3}>
           <TextField
