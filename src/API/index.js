@@ -1,5 +1,5 @@
 // Collecting all APIs in to this file
-import { api_adminSignin } from './users'; // users APIs
+import { apiAdminSignin } from './Users'; // users APIs
 
 // Exporting all the APIs
-export { api_adminSignin }; // users
+export { apiAdminSignin }; // users
