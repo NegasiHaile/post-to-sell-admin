@@ -33,7 +33,9 @@ export default function LoginForm() {
     validationSchema: LoginSchema,
     onSubmit: async (credintials) => {
       try {
-        await apiAdminSignin({ ...credintials });
+        const res = await apiAdminSignin({ ...credintials });
+        localStorage.setItem('accesstoken', res.data.accesstoken);
+        localStorage.setItem('refreshtoken', res.data.refreshtoken);
         navigate('/dashboard/app', { replace: true });
       } catch (error) {
         setOpenError(error.response.data.msg);
