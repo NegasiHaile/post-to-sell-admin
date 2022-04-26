@@ -36,7 +36,8 @@ export default function LoginForm() {
         const res = await apiAdminSignin({ ...credintials });
         localStorage.setItem('accesstoken', res.data.accesstoken);
         localStorage.setItem('refreshtoken', res.data.refreshtoken);
-        navigate('/dashboard/app', { replace: true });
+        window.location.href = '/';
+        // navigate('/dashboard/app', { replace: true });
       } catch (error) {
         setOpenError(error.response.data.msg);
       }
