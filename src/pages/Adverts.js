@@ -148,6 +148,20 @@ export default function Adverts() {
     setFilterName(event.target.value);
   };
 
+  // Edit advert detail
+  const editAdvert = (advert) => {
+    alert('Edited successfully!');
+  };
+
+  // Delete advert detail
+  const deleteAdvert = (advert) => {
+    alert('Deleted successfully!');
+  };
+
+  const getAdvertDetail = (advert) => {
+    alert('Test done!');
+  };
+
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - advertsList.length) : 0;
 
   const filteredUsers = applySortFilter(advertsList, getComparator(order, orderBy), filterName);
@@ -209,7 +223,28 @@ export default function Adverts() {
                         <TableCell align="left">{advertPayment ? 'Done' : 'Unpaid'}</TableCell>
 
                         <TableCell align="right">
-                          <UserMoreMenu />
+                          <UserMoreMenu
+                            data={[
+                              {
+                                label: 'Edit',
+                                icon: 'eva:edit-fill',
+                                color: '#04AA6D',
+                                onClick: () => editAdvert(row),
+                              },
+                              {
+                                label: 'Delete',
+                                icon: 'eva:trash-2-outline',
+                                color: '#FF4436',
+                                onClick: () => deleteAdvert(row),
+                              },
+                              {
+                                label: 'Detail',
+                                icon: 'fluent:apps-list-detail-24-regular',
+                                color: '#2065D1',
+                                onClick: () => getAdvertDetail(row),
+                              },
+                            ]}
+                          />
                         </TableCell>
                       </TableRow>
                     );
