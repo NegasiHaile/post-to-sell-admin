@@ -26,6 +26,8 @@ import Scrollbar from '../components/Scrollbar';
 import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
+// functions
+import { fDate } from '../utils/formatTime';
 // API
 import { apiGetAllAdverts } from '../API/index';
 // ----------------------------------------------------------------------
@@ -203,7 +205,7 @@ export default function Adverts() {
                         </TableCell>
                         <TableCell align="left">{title}</TableCell>
                         <TableCell align="left">{type}</TableCell>
-                        <TableCell align="left">{createdAt}</TableCell>
+                        <TableCell align="left">{fDate(createdAt)}</TableCell>
                         <TableCell align="left">{advertPayment ? 'Done' : 'Unpaid'}</TableCell>
 
                         <TableCell align="right">
