@@ -28,27 +28,25 @@ export default function UserMoreMenu({ data }) {
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
         {data ? (
-          <>
-            {data.map((singleMenu, index) => {
-              return (
-                <MenuItem
-                  key={index}
-                  onClick={singleMenu.onClick}
-                  sx={{ color: singleMenu.color ? singleMenu.color : '' }}
-                >
-                  <ListItemIcon>
-                    <Iconify
-                      icon={singleMenu.icon}
-                      width={24}
-                      height={24}
-                      sx={{ color: singleMenu.color ? singleMenu.color : '' }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText primary={singleMenu.label} primaryTypographyProps={{ variant: 'body2' }} />
-                </MenuItem>
-              );
-            })}
-          </>
+          data.map((singleMenu, index) => {
+            return (
+              <MenuItem
+                key={index}
+                onClick={singleMenu.onClick}
+                sx={{ color: singleMenu.color ? singleMenu.color : '' }}
+              >
+                <ListItemIcon>
+                  <Iconify
+                    icon={singleMenu.icon}
+                    width={24}
+                    height={24}
+                    sx={{ color: singleMenu.color ? singleMenu.color : '' }}
+                  />
+                </ListItemIcon>
+                <ListItemText primary={singleMenu.label} primaryTypographyProps={{ variant: 'body2' }} />
+              </MenuItem>
+            );
+          })
         ) : (
           <>
             <MenuItem sx={{ color: 'text.secondary' }}>
