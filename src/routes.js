@@ -1,9 +1,8 @@
 import { Navigate, useRoutes } from 'react-router-dom';
 // layouts
 import DashboardLayout from './layouts/dashboard';
-import LogoOnlyLayout from './layouts/LogoOnlyLayout';
 //
-import Adverts from './pages/Blog';
+import Adverts from './pages/Adverts';
 import User from './pages/User';
 import Login from './pages/Login';
 import NotFound from './pages/Page404';
