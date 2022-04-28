@@ -29,9 +29,13 @@ export default function UserMoreMenu({ data }) {
       >
         {data ? (
           <>
-            {data.map((singleMenu) => {
+            {data.map((singleMenu, index) => {
               return (
-                <MenuItem onClick={singleMenu.onClick} sx={{ color: singleMenu.color ? singleMenu.color : '' }}>
+                <MenuItem
+                  key={index}
+                  onClick={singleMenu.onClick}
+                  sx={{ color: singleMenu.color ? singleMenu.color : '' }}
+                >
                   <ListItemIcon>
                     <Iconify
                       icon={singleMenu.icon}
