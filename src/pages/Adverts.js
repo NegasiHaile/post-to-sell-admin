@@ -29,15 +29,14 @@ import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashbo
 // functions
 import { fDate } from '../utils/formatTime';
 // API
-import { apiGetAllProducts } from '../API/index';
+import { apiGetAllAdverts } from '../API/index';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'productName', label: 'Name', alignRight: false },
-  { id: 'brand', label: 'Brand', alignRight: false },
-  { id: 'currentPrice', label: 'Price', alignRight: false },
+  { id: 'title', label: 'Company', alignRight: false },
+  { id: 'type', label: 'Type', alignRight: false },
   { id: 'createdAt', label: 'Created At', alignRight: false },
-  { id: 'postPayment', label: 'Payment', alignRight: false },
+  { id: 'advertPayment', label: 'Payment', alignRight: false },
   { id: '' },
 ];
 
@@ -67,13 +66,7 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(
-      array,
-      (_advert) =>
-        _advert.productName.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
-        _advert.brand.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
-        _advert.currentPrice.toString().indexOf(query.toString()) !== -1
-    );
+    return filter(array, (_advert) => _advert.title.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis.map((el) => el[0]);
 }
@@ -81,29 +74,29 @@ function applySortFilter(array, comparator, query) {
 export default function Adverts() {
   const [page, setPage] = useState(0); // Page of the table
 
-  const [productsList, setProductsList] = useState([]); // List of products
+  const [advertsList, setAdvertsList] = useState([]); // List of adverts
 
-  const [order, setOrder] = useState('asc'); // Order of the products list
+  const [order, setOrder] = useState('asc'); // Order of the adverts list
 
-  const [selected, setSelected] = useState([]); // List of selected products (using the checkbox)
+  const [selected, setSelected] = useState([]); // List of selected adverts (using the checkbox)
 
-  const [orderBy, setOrderBy] = useState('name'); // Order the list of products by
+  const [orderBy, setOrderBy] = useState('name'); // Order the list of adverts by
 
-  const [filterName, setFilterName] = useState(''); // Filter products by titile
+  const [filterName, setFilterName] = useState(''); // Filter adverts by titile
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
-    // Calling get all products function
-    funcGetAllProducts();
+    // Calling get all adverts function
+    getAllAdverts();
   }, []);
 
-  // Get all list of products
-  const funcGetAllProducts = async () => {
+  // Get all list of adverts
+  const getAllAdverts = async () => {
     try {
-      const res = await apiGetAllProducts();
+      const res = await apiGetAllAdverts();
       console.log(res.data);
-      setProductsList(res.data);
+      setAdvertsList(res.data);
     } catch (error) {
       alert(error.response.data.msg);
     }
@@ -115,17 +108,17 @@ export default function Adverts() {
     setOrderBy(property);
   };
 
-  // Select all list of products
+  // Select all list of adverts
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = productsList.map((n) => n._id);
+      const newSelecteds = advertsList.map((n) => n._id);
       setSelected(newSelecteds);
       return;
     }
     setSelected([]);
   };
 
-  // Handle the click of checkbox from list of products
+  // Handle the click of checkbox from list of adverts
   const handleClick = (event, _id) => {
     const selectedIndex = selected.indexOf(_id);
     let newSelected = [];
@@ -155,33 +148,36 @@ export default function Adverts() {
     setFilterName(event.target.value);
   };
 
-  // Edit product detail
-  const editAdvert = (product) => {
+  // Edit advert detail
+  const editAdvert = (advert) => {
     alert('Edited successfully!');
   };
 
-  // Delete products detail
-  const deleteAdvert = (product) => {
+  // Delete advert detail
+  const deleteAdvert = (advert) => {
     alert('Deleted successfully!');
   };
 
-  const getAdvertDetail = (product) => {
+  const getAdvertDetail = (advert) => {
     alert('Test done!');
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - productsList.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - advertsList.length) : 0;
 
-  const filteredUsers = applySortFilter(productsList, getComparator(order, orderBy), filterName);
+  const filteredUsers = applySortFilter(advertsList, getComparator(order, orderBy), filterName);
 
   const isUserNotFound = filteredUsers.length === 0;
 
   return (
-    <Page title="Products">
+    <Page title="Adverts">
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Products List
+            Adverts List
           </Typography>
+          <Button variant="contained" component={RouterLink} to="#" startIcon={<Iconify icon="eva:plus-fill" />}>
+            New Advert
+          </Button>
         </Stack>
 
         <Card>
@@ -189,7 +185,7 @@ export default function Adverts() {
             numSelected={selected.length}
             filterName={filterName}
             onFilterName={handleFilterByName}
-            table="product"
+            table="advert"
           />
 
           <Scrollbar>
@@ -199,14 +195,14 @@ export default function Adverts() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={productsList.length}
+                  rowCount={advertsList.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { _id, productName, brand, currentPrice, createdAt, postPayment } = row;
+                    const { _id, title, type, createdAt, advertPayment } = row;
                     const isItemSelected = selected.indexOf(_id) !== -1;
 
                     return (
@@ -221,31 +217,31 @@ export default function Adverts() {
                         <TableCell padding="checkbox">
                           <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, _id)} />
                         </TableCell>
-                        <TableCell align="left">{productName}</TableCell>
-                        <TableCell align="left">{brand}</TableCell>
-                        <TableCell align="left">{currentPrice}</TableCell>
+                        <TableCell align="left">{title}</TableCell>
+                        <TableCell align="left">{type}</TableCell>
                         <TableCell align="left">{fDate(createdAt)}</TableCell>
-                        <TableCell align="left">{postPayment ? 'Done' : 'Unpaid'}</TableCell>
+                        <TableCell align="left">{advertPayment ? 'Done' : 'Unpaid'}</TableCell>
 
                         <TableCell align="right">
                           <UserMoreMenu
                             data={[
                               {
-                                label: 'Detail',
-                                icon: 'fluent:apps-list-detail-24-regular',
-                                color: '#2065D1',
-                                onClick: () => getAdvertDetail(row),
-                              },
-                              {
-                                label: 'Owner',
-                                icon: 'carbon:user-admin',
-                                onClick: () => getAdvertDetail(row),
+                                label: 'Edit',
+                                icon: 'eva:edit-fill',
+                                color: '#04AA6D',
+                                onClick: () => editAdvert(row),
                               },
                               {
                                 label: 'Delete',
                                 icon: 'eva:trash-2-outline',
                                 color: '#FF4436',
                                 onClick: () => deleteAdvert(row),
+                              },
+                              {
+                                label: 'Detail',
+                                icon: 'fluent:apps-list-detail-24-regular',
+                                color: '#2065D1',
+                                onClick: () => getAdvertDetail(row),
                               },
                             ]}
                           />
@@ -276,7 +272,7 @@ export default function Adverts() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={productsList.length}
+            count={advertsList.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
