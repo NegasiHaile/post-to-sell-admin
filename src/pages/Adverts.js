@@ -175,9 +175,6 @@ export default function Adverts() {
           <Typography variant="h4" gutterBottom>
             Adverts List
           </Typography>
-          <Button variant="contained" component={RouterLink} to="#" startIcon={<Iconify icon="eva:plus-fill" />}>
-            New Advert
-          </Button>
         </Stack>
 
         <Card>
