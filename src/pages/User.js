@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState } from "react";
 import { filter } from "lodash";
 import { sentenceCase } from "change-case";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 // material
 import {
   Card,
@@ -139,6 +139,7 @@ export default function User() {
   const [USERLIST, setUSERLIST] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [viewDetail, setViewDetail] = useState(false);
+  const navigate = useNavigate();
 
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState("asc");
@@ -166,47 +167,161 @@ export default function User() {
     setIsDeleting(false);
     setOpenDeleteModal(true);
   };
-  const onConfirmDelete = () => {
+  const onConfirmDelete = async () => {
     setDeleteResult({
       state: "success",
       message: "",
     });
     setIsDeleting(true);
-    axios
-      .delete(`${BASE_URL}/api/products/${selectedMessage.id}`, {
-        headers: {
-          accessTokenOcr: localStorage.getItem("accessTokenOcr"),
-        },
-      })
-      .then((res) => {
-        if (!res.data.error) {
-          setDeleteResult({
-            state: "success",
-            message: "users deleted successfully!",
-          });
-          setIsDeleting(false);
-          setApiData({
-            state: "success",
-            message: "",
-            data: null,
-          });
-          setOpenDeleteModal(false);
-          loadData();
-        } else {
-          setDeleteResult({
-            state: "error",
-            message: "Something went wrong while deleting users!",
-          });
-          setIsDeleting(false);
+    try {
+      const res = await axios.delete(
+        `${BASE_URL}/api/users/delete/${selectedMessage.id}`,
+        {
+          headers: {
+            Authorization: access,
+          },
         }
-      })
-      .catch((error) => {
-        setDeleteResult({
-          state: "error",
-          message: "Something went wrong while deleting users!",
-        });
-        setIsDeleting(false);
+      );
+
+      setDeleteResult({
+        state: "success",
+        message: "users deleted successfully!",
       });
+      setIsDeleting(false);
+      setApiData({
+        state: "success",
+        message: "",
+        data: null,
+      });
+      setOpenDeleteModal(false);
+      loadData();
+    } catch (error) {
+      setDeleteResult({
+        state: "error",
+        message: error.response.data.msg
+          ? error.response.data.msg
+          : "Something went wrong while deleting users!",
+      });
+      setIsDeleting(false);
+    }
+  };
+
+  const [isActivating, setIsActivating] = useState(false);
+  const [openActivateModal, setOpenActivateModal] = useState(false);
+  const [ActivateResult, setActivateResult] = useState({
+    state: "success",
+    message: "",
+  });
+  const handleCloseActivate = () => {
+    setOpenActivateModal(false);
+    setSelectedMessage(null);
+  };
+  const onActivateTeams = (message) => {
+    setSelectedMessage(message);
+    setActivateResult({
+      state: "success",
+      message: "",
+    });
+    setIsActivating(false);
+    setOpenActivateModal(true);
+  };
+  const onConfirmActivate = async () => {
+    setActivateResult({
+      state: "success",
+      message: "",
+    });
+    setIsActivating(true);
+    try {
+      const res = await axios.put(
+        `${BASE_URL}/api/users/activate_account/${selectedMessage.id}`,
+        {},
+        {
+          headers: {
+            Authorization: access,
+          },
+        }
+      );
+
+      setActivateResult({
+        state: "success",
+        message: "users Activated successfully!",
+      });
+      setIsActivating(false);
+      setApiData({
+        state: "success",
+        message: "",
+        data: null,
+      });
+      setOpenActivateModal(false);
+      loadData();
+    } catch (error) {
+      setActivateResult({
+        state: "error",
+        message: error.response.data.msg
+          ? error.response.data.msg
+          : "Something went wrong while Activating users!",
+      });
+      setIsActivating(false);
+    }
+  };
+
+  const [isBlocking, setIsBlocking] = useState(false);
+  const [openBlockModal, setOpenBlockModal] = useState(false);
+  const [BlockResult, setBlockResult] = useState({
+    state: "success",
+    message: "",
+  });
+  const handleCloseBlock = () => {
+    setOpenBlockModal(false);
+    setSelectedMessage(null);
+  };
+  const onBlockTeams = (message) => {
+    setSelectedMessage(message);
+    setBlockResult({
+      state: "success",
+      message: "",
+    });
+    setIsBlocking(false);
+    setOpenBlockModal(true);
+  };
+  const onConfirmBlock = async () => {
+    setBlockResult({
+      state: "success",
+      message: "",
+    });
+    setIsBlocking(true);
+    try {
+      const res = await axios.put(
+        `${BASE_URL}/api/users/block_account/${selectedMessage.id}`,
+        {},
+        {
+          headers: {
+            Authorization: access,
+          },
+        }
+      );
+
+      setBlockResult({
+        state: "success",
+        message: "users Blockd successfully!",
+      });
+      setIsBlocking(false);
+      setApiData({
+        state: "success",
+        message: "",
+        data: null,
+      });
+      setOpenBlockModal(false);
+      loadData();
+    } catch (error) {
+      setBlockResult({
+        state: "error",
+        message: error.response.data.msg
+          ? error.response.data.msg
+          : "Something went wrong while Blocking users!",
+      });
+      setIsBlocking(false);
+    }
   };
 
   const [addResult, setAddResult] = useState({
@@ -333,7 +448,7 @@ export default function User() {
     data: null,
   });
 
-  const loadData2 = async () => {
+  const loadData = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/api/users/list`, {
         headers: {
@@ -359,7 +474,7 @@ export default function User() {
     }
   };
 
-  const loadData = () => {
+  const loadData2 = () => {
     axios
       .get(`${BASE_URL}/api/users/list`, {
         headers: {
@@ -393,7 +508,7 @@ export default function User() {
   };
 
   useEffect(() => {
-    loadData2();
+    loadData();
   }, []);
 
   return apiData.data ? (
@@ -501,38 +616,32 @@ export default function User() {
                           </TableCell>
                           <TableCell align="left">{row.date}</TableCell>
                           <TableCell align="right">
-                            <Stack direction="row" spacing={1}>
-                              <Chip
-                                label="Products"
-                                component="a"
-                                color="success"
-                                href="#basic-chip"
-                                variant="outlined"
-                                clickable
-                                /* onClick={() => onAddTeams(row)} */
-                              />
-                              <Chip
-                                label="Edit"
-                                component="a"
-                                color="info"
-                                href="#basic-chip"
-                                variant="outlined"
-                                clickable
-                                onClick={() => onAddTeams(row)}
-                              />
-                              <Chip
-                                label="Delete"
-                                component="a"
-                                color="error"
-                                href="#basic-chip"
-                                variant="outlined"
-                                clickable
-                                onClick={() => onDeleteTeams(row)}
-                              />
-                            </Stack>
-                          </TableCell>
-                          <TableCell align="right">
-                            <UserMoreMenu />
+                            <UserMoreMenu
+                              data={[
+                                row.accountStatus === "On"
+                                  ? {
+                                      label: "Block",
+                                      icon: "eva:edit-fill",
+                                      onClick: () => onBlockTeams(row),
+                                    }
+                                  : {
+                                      label: "Activate",
+                                      icon: "eva:edit-fill",
+                                      onClick: () => onActivateTeams(row),
+                                    },
+                                {
+                                  label: "Delete",
+                                  icon: "eva:trash-2-outline",
+                                  onClick: () => onDeleteTeams(row),
+                                },
+                                {
+                                  label: "Products",
+                                  icon: "eva:trash-2-outline",
+                                  onClick: () =>
+                                    navigate(`list-products/${row.id}`),
+                                },
+                              ]}
+                            />
                           </TableCell>
                         </TableRow>
                       );
@@ -597,6 +706,70 @@ export default function User() {
             autoFocus
           >
             Delete
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openActivateModal}
+        onClose={handleCloseActivate}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Activate User?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            are you sure you want to Activate selected user.
+          </DialogContentText>
+        </DialogContent>
+
+        {ActivateResult.message && ActivateResult.message !== "" && (
+          <Alert severity={ActivateResult.state} variant="outlined">
+            {ActivateResult.message}
+          </Alert>
+        )}
+        <DialogActions>
+          <Button disabled={isActivating} onClick={handleCloseActivate}>
+            Cancel
+          </Button>
+          <LoadingButton
+            disabled={isActivating}
+            onClick={onConfirmActivate}
+            loading={isActivating}
+            autoFocus
+          >
+            Activate
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openBlockModal}
+        onClose={handleCloseBlock}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Block User?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            are you sure you want to Block selected user.
+          </DialogContentText>
+        </DialogContent>
+
+        {BlockResult.message && BlockResult.message !== "" && (
+          <Alert severity={BlockResult.state} variant="outlined">
+            {BlockResult.message}
+          </Alert>
+        )}
+        <DialogActions>
+          <Button disabled={isBlocking} onClick={handleCloseBlock}>
+            Cancel
+          </Button>
+          <LoadingButton
+            disabled={isBlocking}
+            onClick={onConfirmBlock}
+            loading={isBlocking}
+            autoFocus
+          >
+            Block
           </LoadingButton>
         </DialogActions>
       </Dialog>
