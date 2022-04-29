@@ -595,9 +595,11 @@ export default function User() {
                             <Label
                               variant="ghost"
                               color={
-                                (row.accountStatus === "unverified" &&
-                                  "error") ||
-                                "success"
+                                row.accountStatus === "ON"
+                                  ? "success"
+                                  : row.accountStatus === "unverified"
+                                  ? "warning"
+                                  : "error"
                               }
                             >
                               {sentenceCase(row.accountStatus)}
@@ -618,27 +620,38 @@ export default function User() {
                           <TableCell align="right">
                             <UserMoreMenu
                               data={[
-                                row.accountStatus === "On"
-                                  ? {
-                                      label: "Block",
-                                      icon: "eva:edit-fill",
-                                      onClick: () => onBlockTeams(row),
-                                    }
-                                  : {
-                                      label: "Activate",
-                                      icon: "eva:edit-fill",
-                                      onClick: () => onActivateTeams(row),
-                                    },
-                                {
-                                  label: "Delete",
-                                  icon: "eva:trash-2-outline",
-                                  onClick: () => onDeleteTeams(row),
-                                },
+                                ...(row.accountStatus === "ON"
+                                  ? [
+                                      {
+                                        label: "Block",
+                                        icon: "eva:edit-fill",
+                                        color: "#FF4436",
+                                        onClick: () => onBlockTeams(row),
+                                      },
+                                    ]
+                                  : []),
+                                ...(row.accountStatus === "OFF"
+                                  ? [
+                                      {
+                                        label: "Activate",
+                                        color: "#04AA6D",
+                                        icon: "eva:edit-fill",
+                                        onClick: () => onActivateTeams(row),
+                                      },
+                                    ]
+                                  : []),
                                 {
                                   label: "Products",
                                   icon: "eva:trash-2-outline",
+                                  color: "#2065D1",
                                   onClick: () =>
                                     navigate(`list-products/${row.id}`),
+                                },
+                                {
+                                  label: "Delete",
+                                  color: "#FF4436",
+                                  icon: "eva:trash-2-outline",
+                                  onClick: () => onDeleteTeams(row),
                                 },
                               ]}
                             />
