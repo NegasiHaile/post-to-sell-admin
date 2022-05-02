@@ -1,40 +1,18 @@
-## Minimal [(Free version)](https://minimal-kit-react.vercel.app/)
+# Post-To-Sell e-commerrce app of admin app
 
-![license](https://img.shields.io/badge/license-MIT-blue.svg)
+> This is the post to sell e-commerce application of admin pannel app.
 
-> Free React Admin Dashboard made with Material-UI components and React.
+## Developed by
 
-![preview](public/static/preview.jpg)
+> This admin pannel is developed by Horizontech ICT solution (https://www.horizontechict.com/) web full-stack developers team.
 
-| [Minimal Free](https://minimal-kit-react.vercel.app/) | [Minimal](https://material-ui.com/store/items/minimal-dashboard/) |
-| ----------------------------------------------------- | :---------------------------------------------------------------- |
-| **7** Demo pages                                      | **42+** demo pages                                                |
-| -                                                     | ✓ Multi-language                                                  |
-| -                                                     | ✓ Dark/Light Mode 🌓                                              |
-| -                                                     | ✓ [More components](https://minimals.cc/components)               |
-| -                                                     | ✓ TypeScript version                                              |
-| -                                                     | ✓ Design files (Figma & Sketch)                                   |
+## Contributors
 
-## Page demo
+-> Negasi Haile = NegasiHaile19@gmail.com
+-> Mintesnot Yismaw = YismawMintesnot@gmail.com
 
-- [Dashboard](https://minimal-kit-react.vercel.app/dashboard/app)
-- [Users](https://minimal-kit-react.vercel.app/dashboard/user)
-- [Product](https://minimal-kit-react.vercel.app/dashboard/products)
-- [Blog](https://minimal-kit-react.vercel.app/dashboard/blog)
-- [Login](https://minimal-kit-react.vercel.app/login)
-- [Register](https://minimal-kit-react.vercel.app/register)
-- [Not Found](https://minimal-kit-react.vercel.app/404)
+## Used tools
 
-## Getting started
-
-- Recommended `node js 14.x` and `npm 6+`
-- Install dependencies: `npm install` or `yarn install`
-- Start the project: `npm run start` or `yarn start`
-
-## License
-
-Distributed under the MIT License. See [LICENSE](https://github.com/minimal-ui-kit/minimal.free/blob/main/LICENSE.md) for more information.
-
-## Contact us
-
-Email Us: support@minimals.cc
+-> React js
+-> Material UI
+-> Iconify
