@@ -26,6 +26,11 @@ const navConfig = [
     path: '/dashboard/adverts',
     icon: getIcon('eva:file-text-fill'),
   },
+  {
+    title: 'Banners',
+    path: '/dashboard/banners',
+    icon: getIcon('uil:postcard'),
+  },
   // {
   //   title: 'register',
   //   path: '/register',
