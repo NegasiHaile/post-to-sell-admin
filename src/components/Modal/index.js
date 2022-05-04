@@ -1,15 +1,11 @@
 import React from 'react';
 import { Button, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTheme } from '@mui/material/styles';
 
 function CustomModal({ showModal, setShowModal }) {
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   return (
     <Dialog
-      fullScreen={fullScreen}
+      maxWidth={'md'}
       open={showModal.status}
       onClose={() => setShowModal({ ...showModal, status: false })}
       aria-labelledby="alert-dialog-title"
