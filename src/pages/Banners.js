@@ -24,10 +24,11 @@ import Page from '../components/Page';
 import Scrollbar from '../components/Scrollbar';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
+import CustomModal from '../components/Modal';
 // functions
 import { fDate } from '../utils/formatTime';
 // API
-import { apiGetAllBanners } from '../API/index';
+import { apiGetAllBanners, apiDeleteBanner } from '../API/index';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
@@ -64,37 +65,47 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_advert) => _advert.title.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_banner) => _banner.title.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis.map((el) => el[0]);
 }
 
+// Initial values for the modal
+const initialShowModal = {
+  action: '',
+  status: false,
+  title: '',
+  contentText: '',
+  onConfirm: null,
+  isLoading: false,
+};
 export default function Banners() {
   let navigate = useNavigate();
   const [page, setPage] = useState(0); // Page of the table
 
-  const [bannersList, setBannersList] = useState([]); // List of adverts
+  const [bannersList, setBannersList] = useState([]); // List of banners
 
-  const [order, setOrder] = useState('asc'); // Order of the adverts list
+  const [order, setOrder] = useState('asc'); // Order of the banners list
 
-  const [selected, setSelected] = useState([]); // List of selected adverts (using the checkbox)
+  const [selected, setSelected] = useState([]); // List of selected banners (using the checkbox)
 
-  const [orderBy, setOrderBy] = useState('name'); // Order the list of adverts by
+  const [orderBy, setOrderBy] = useState('name'); // Order the list of banners by
 
-  const [filterName, setFilterName] = useState(''); // Filter adverts by titile
+  const [filterName, setFilterName] = useState(''); // Filter banners by titile
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const [showModal, setShowModal] = useState(initialShowModal);
+
   useEffect(() => {
-    // Calling get all adverts function
+    // Calling get all banners function
     getAllBanners();
   }, []);
 
-  // Get all list of adverts
+  // Get all list of banners
   const getAllBanners = async () => {
     try {
       const res = await apiGetAllBanners();
-      console.log(res.data);
       setBannersList(res.data);
     } catch (error) {
       alert(error.response.data.msg);
@@ -107,7 +118,7 @@ export default function Banners() {
     setOrderBy(property);
   };
 
-  // Select all list of adverts
+  // Select all list of banners
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
       const newSelecteds = bannersList.map((n) => n._id);
@@ -117,7 +128,7 @@ export default function Banners() {
     setSelected([]);
   };
 
-  // Handle the click of checkbox from list of adverts
+  // Handle the click of checkbox from list of banners
   const handleClick = (event, _id) => {
     const selectedIndex = selected.indexOf(_id);
     let newSelected = [];
@@ -148,16 +159,23 @@ export default function Banners() {
   };
 
   // Edit banner detail
-  const editBannerDetail = (advert) => {
+  const editBannerDetail = (banner) => {
     alert('Edited successfully!');
   };
 
   // Delete Banner detail
-  const deleteBanner = (advert) => {
-    alert('Deleted successfully!');
+  const deleteBanner = async (banner) => {
+    try {
+      const res = await apiDeleteBanner(banner._id);
+      getAllBanners();
+      setShowModal(initialShowModal);
+      alert(res.data.msg);
+    } catch (error) {
+      alert(error.response.data.msg);
+    }
   };
 
-  const getBnnerDetail = (advert) => {
+  const getBnnerDetail = (banner) => {
     alert('Test done!');
   };
 
@@ -244,7 +262,15 @@ export default function Banners() {
                                 label: 'Delete',
                                 icon: 'eva:trash-2-outline',
                                 color: '#FF4436',
-                                onClick: () => deleteBanner(row),
+                                onClick: () =>
+                                  setShowModal({
+                                    action: 'Delete',
+                                    status: true,
+                                    title: 'Delete this?',
+                                    contentText: 'Are you sure you want to delete thsis banner permanently?',
+                                    onConfirm: () => deleteBanner(row),
+                                    isLoading: false,
+                                  }),
                               },
                               {
                                 label: 'Detail',
@@ -288,6 +314,7 @@ export default function Banners() {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
+        <CustomModal showModal={showModal} setShowModal={setShowModal} />
       </Container>
     </Page>
   );
