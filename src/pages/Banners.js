@@ -16,6 +16,13 @@ import {
   Typography,
   TableContainer,
   TablePagination,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Grid,
+  Paper,
 } from '@mui/material';
 // Source of Icons
 import Iconify from '../components/Iconify';
@@ -25,6 +32,7 @@ import Scrollbar from '../components/Scrollbar';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
 import CustomModal from '../components/Modal';
+import BannerPreview from '../components/Banner/BannerPreview';
 // functions
 import { fDate } from '../utils/formatTime';
 // API
@@ -94,6 +102,8 @@ export default function Banners() {
   const [filterName, setFilterName] = useState(''); // Filter banners by titile
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const [openBannerDialog, setOpenBannerDialog] = useState(false); // State for banner dialog
 
   const [showModal, setShowModal] = useState(initialShowModal);
 
@@ -185,9 +195,9 @@ export default function Banners() {
   }
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - bannersList.length) : 0;
 
-  const filteredUsers = applySortFilter(bannersList, getComparator(order, orderBy), filterName);
+  const filteredBanners = applySortFilter(bannersList, getComparator(order, orderBy), filterName);
 
-  const isUserNotFound = filteredUsers.length === 0;
+  const isBannerNotFound = filteredBanners.length === 0;
 
   return (
     <Page title="Banners">
@@ -201,7 +211,7 @@ export default function Banners() {
             component={RouterLink}
             to="#"
             startIcon={<Iconify icon="eva:plus-fill" />}
-            onClick={() => routeChange('/dashboard/products')}
+            onClick={() => setOpenBannerDialog(true)}
           >
             New Banner
           </Button>
@@ -228,7 +238,7 @@ export default function Banners() {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                  {filteredBanners.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                     const { _id, sequence, title, createdAt, duration } = row;
                     const isItemSelected = selected.indexOf(_id) !== -1;
 
@@ -291,7 +301,7 @@ export default function Banners() {
                   )}
                 </TableBody>
 
-                {isUserNotFound && (
+                {isBannerNotFound && (
                   <TableBody>
                     <TableRow>
                       <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
@@ -314,6 +324,51 @@ export default function Banners() {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
+
+        {/* Banner form dialog */}
+        <Dialog
+          fullScreen
+          open={openBannerDialog}
+          onClose={() => setOpenBannerDialog(false)}
+          aria-labelledby="form-dialog-title"
+        >
+          {/* <DialogTitle id="form-dialog-title">Add new banner</DialogTitle> */}
+          <BannerPreview />
+          <DialogContent>
+            <Grid container spacing={1} sx={{ mt: 3 }}>
+              <Grid item xs={12} sm={11} md={6} lg={3}>
+                <TextField autoFocus margin="dense" id="name" type="file" fullWidth />
+              </Grid>
+              <Grid item xs={12} sm={11} md={6} lg={3}>
+                <TextField autoFocus margin="dense" id="name" label="Title" type="text" fullWidth />
+              </Grid>
+              <Grid item xs={12} sm={11} md={6} lg={3}>
+                <TextField
+                  InputProps={{ inputProps: { min: 0, max: 10 } }}
+                  autoFocus
+                  margin="dense"
+                  id="name"
+                  label="Squence"
+                  fullWidth
+                  type="number"
+                  size="medium"
+                />
+              </Grid>
+              <Grid item xs={12} sm={11} md={6} lg={3}>
+                <TextField type="date" autoFocus margin="dense" id="name" fullWidth size="medium" />
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenBannerDialog(false)} color="error" variant="contained">
+              Cancel
+            </Button>
+            <Button onClick={() => setOpenBannerDialog(false)} color="primary" variant="contained">
+              Add Banner
+            </Button>
+          </DialogActions>
+        </Dialog>
+        {/* Action conformation dialog */}
         <CustomModal showModal={showModal} setShowModal={setShowModal} />
       </Container>
     </Page>
