@@ -16,13 +16,6 @@ import {
   Typography,
   TableContainer,
   TablePagination,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Grid,
-  Paper,
 } from '@mui/material';
 // Source of Icons
 import Iconify from '../components/Iconify';
@@ -32,8 +25,9 @@ import Scrollbar from '../components/Scrollbar';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
 import CustomModal from '../components/Modal';
-import BannerPreview from '../components/Banner/BannerPreview';
-// functions
+import BannerForm from '../components/Banner/BannerForm';
+// Utils
+import Toast from '../components/Utils/Toast';
 import { fDate } from '../utils/formatTime';
 // API
 import { apiGetAllBanners, apiDeleteBanner } from '../API/index';
@@ -87,9 +81,19 @@ const initialShowModal = {
   onConfirm: null,
   isLoading: false,
 };
+
+// Banner Initial state
+const bannerInitailState = {
+  banner: '',
+  title: '',
+  sequence: '',
+  duration: '',
+};
 export default function Banners() {
   let navigate = useNavigate();
   const [page, setPage] = useState(0); // Page of the table
+
+  const [banner, setBanner] = useState(bannerInitailState); // Banner detail
 
   const [bannersList, setBannersList] = useState([]); // List of banners
 
@@ -168,31 +172,18 @@ export default function Banners() {
     setFilterName(event.target.value);
   };
 
-  // Edit banner detail
-  const editBannerDetail = (banner) => {
-    alert('Edited successfully!');
-  };
-
   // Delete Banner detail
   const deleteBanner = async (banner) => {
     try {
       const res = await apiDeleteBanner(banner._id);
       getAllBanners();
       setShowModal(initialShowModal);
-      alert(res.data.msg);
+      Toast('sucess', res.data.msg);
     } catch (error) {
-      alert(error.response.data.msg);
+      Toast('error', error.response.data.msg);
     }
   };
 
-  const getBnnerDetail = (banner) => {
-    alert('Test done!');
-  };
-
-  function routeChange(path) {
-    navigate(path);
-    //     alert('Route change to :' + path);
-  }
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - bannersList.length) : 0;
 
   const filteredBanners = applySortFilter(bannersList, getComparator(order, orderBy), filterName);
@@ -255,7 +246,7 @@ export default function Banners() {
                           <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, _id)} />
                         </TableCell>
                         <TableCell align="left">{sequence}</TableCell>
-                        <TableCell align="left">{title}</TableCell>
+                        <TableCell align="left">{title ? title : "Title didn't added!"}</TableCell>
                         <TableCell align="left">{fDate(createdAt)}</TableCell>
                         <TableCell align="left">{fDate(duration)}</TableCell>
 
@@ -266,7 +257,10 @@ export default function Banners() {
                                 label: 'Edit',
                                 icon: 'eva:edit-fill',
                                 color: '#04AA6D',
-                                onClick: () => editBannerDetail(row),
+                                onClick: () => {
+                                  setBanner({ ...row });
+                                  setOpenBannerDialog(true);
+                                },
                               },
                               {
                                 label: 'Delete',
@@ -281,12 +275,6 @@ export default function Banners() {
                                     onConfirm: () => deleteBanner(row),
                                     isLoading: false,
                                   }),
-                              },
-                              {
-                                label: 'Detail',
-                                icon: 'fluent:apps-list-detail-24-regular',
-                                color: '#2065D1',
-                                onClick: () => getBnnerDetail(row),
                               },
                             ]}
                           />
@@ -326,48 +314,14 @@ export default function Banners() {
         </Card>
 
         {/* Banner form dialog */}
-        <Dialog
-          fullScreen
-          open={openBannerDialog}
-          onClose={() => setOpenBannerDialog(false)}
-          aria-labelledby="form-dialog-title"
-        >
-          {/* <DialogTitle id="form-dialog-title">Add new banner</DialogTitle> */}
-          <BannerPreview />
-          <DialogContent>
-            <Grid container spacing={1} sx={{ mt: 3 }}>
-              <Grid item xs={12} sm={11} md={6} lg={3}>
-                <TextField autoFocus margin="dense" id="name" type="file" fullWidth />
-              </Grid>
-              <Grid item xs={12} sm={11} md={6} lg={3}>
-                <TextField autoFocus margin="dense" id="name" label="Title" type="text" fullWidth />
-              </Grid>
-              <Grid item xs={12} sm={11} md={6} lg={3}>
-                <TextField
-                  InputProps={{ inputProps: { min: 0, max: 10 } }}
-                  autoFocus
-                  margin="dense"
-                  id="name"
-                  label="Squence"
-                  fullWidth
-                  type="number"
-                  size="medium"
-                />
-              </Grid>
-              <Grid item xs={12} sm={11} md={6} lg={3}>
-                <TextField type="date" autoFocus margin="dense" id="name" fullWidth size="medium" />
-              </Grid>
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpenBannerDialog(false)} color="error" variant="contained">
-              Cancel
-            </Button>
-            <Button onClick={() => setOpenBannerDialog(false)} color="primary" variant="contained">
-              Add Banner
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <BannerForm
+          openBannerDialog={openBannerDialog}
+          setOpenBannerDialog={setOpenBannerDialog}
+          bannerInitailState={bannerInitailState}
+          banner={banner}
+          setBanner={setBanner}
+          getAllBanners={getAllBanners}
+        />
         {/* Action conformation dialog */}
         <CustomModal showModal={showModal} setShowModal={setShowModal} />
       </Container>
