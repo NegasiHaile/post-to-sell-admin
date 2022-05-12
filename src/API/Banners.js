@@ -10,6 +10,16 @@ export const apiGetAllBanners = async () => {
   return await axios.get(`${server}/api/banners/list`);
 };
 
+// Add new banner
+export const apiAddNewBanner = async (data) => {
+  return await axios.post(`${server}/api/banners/add`, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      Authorization: accesstoken,
+    },
+  });
+};
+
 // Delete banner (Postcard to beexport const apiGetAllBanners = async () => {
 export const apiDeleteBanner = async (id) => {
   return await axios.delete(`${server}/api/banners/delete/${id}`, {
