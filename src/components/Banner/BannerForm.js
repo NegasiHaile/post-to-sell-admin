@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
 // APIs
-import { apiAddNewBanner } from '../../API/index';
+import { apiAddNewBanner, apiEditBanner } from '../../API/index';
 // Server domain names
 import { server } from '../../Constants/Server_Base_URL';
 // Material UI components
 import { Button, Dialog, DialogContent, DialogActions, Grid, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import Snackbar from '@mui/material/Snackbar';
 
 // Custome components
 import BannerPreview from './BannerPreview';
@@ -49,21 +48,34 @@ const BannerForm = ({
     }
   };
 
+  // Reseting of States
+  const resetStates = (type, msg) => {
+    setBannerPreview(null);
+    setBanner(bannerInitailState);
+    setOpenBannerDialog(false);
+    getAllBanners();
+    Toast(type, msg);
+  };
+
+  // On submit button add new banner or edit exiting one
   const onSubmitForm = async (e) => {
     e.preventDefault();
     try {
-      const formData = new FormData();
-      formData.append('title', banner.title);
-      formData.append('duration', banner.duration);
-      formData.append('sequence', banner.sequence);
-      formData.append('banner', banner.banner);
+      // if there is a banner._id, it means it's existing banner
+      // So it means the action is editing else the action is registering of new banner
+      if (banner._id) {
+        const res = await apiEditBanner(banner);
+        resetStates('success', res.data.msg);
+      } else {
+        const formData = new FormData();
+        formData.append('title', banner.title);
+        formData.append('duration', banner.duration);
+        formData.append('sequence', banner.sequence);
+        formData.append('banner', banner.banner);
 
-      const res = await apiAddNewBanner(formData);
-      setBannerPreview(null);
-      setBanner(bannerInitailState);
-      setOpenBannerDialog(false);
-      getAllBanners();
-      Toast('success', res.data.msg);
+        const res = await apiAddNewBanner(formData);
+        resetStates('success', res.data.msg);
+      }
     } catch (error) {
       Toast('error', error.response.data.msg);
     }
