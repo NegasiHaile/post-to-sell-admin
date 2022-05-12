@@ -5,6 +5,7 @@ import { server } from '../Constants/Server_Base_URL';
 
 // Token from local storage
 const accesstoken = localStorage.getItem('accesstoken');
+
 // Get all list of banners (Postcard to be showed on the top of the client app landing page)
 export const apiGetAllBanners = async () => {
   return await axios.get(`${server}/api/banners/list`);
@@ -18,6 +19,19 @@ export const apiAddNewBanner = async (data) => {
       Authorization: accesstoken,
     },
   });
+};
+
+// Add new banner
+export const apiEditBanner = async (data) => {
+  return await axios.put(
+    `${server}/api/banners/edit/${data._id}`,
+    { ...data },
+    {
+      headers: {
+        Authorization: accesstoken,
+      },
+    }
+  );
 };
 
 // Delete banner (Postcard to beexport const apiGetAllBanners = async () => {
