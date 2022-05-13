@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 // APIs
-import { apiAddNewBanner, apiEditBanner } from '../../API/index';
+import { apiAddNewBanner, apiEditBanner, apiEditBannerImage } from '../../API/index';
 // Server domain names
 import { server } from '../../Constants/Server_Base_URL';
 // Material UI components
@@ -24,6 +24,7 @@ const BannerForm = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false); // If on submiting button will get disabled and loading
   const [bannerPreview, setBannerPreview] = useState(null);
+  const [isBannerImageEditing, setIsIsBannerImageEditing] = useState(false);
 
   useEffect(() => {
     let objectUrl;
@@ -48,15 +49,29 @@ const BannerForm = ({
     }
   };
 
+  // On Editing of banner image imput change
+  const onChangeBannerImage = (e) => {
+    setIsIsBannerImageEditing(true);
+    setBanner({ ...banner, [e.target.name]: e.target.files[0] });
+  };
+
   // Reseting of States
   const resetStates = (type, msg) => {
     setBannerPreview(null);
     setBanner(bannerInitailState);
+    setIsIsBannerImageEditing(false);
     setOpenBannerDialog(false);
     getAllBanners();
     Toast(type, msg);
   };
 
+  const editBannerImage = async () => {
+    const formData = new FormData();
+    formData.append('banner', banner.banner);
+    const res2 = await apiEditBannerImage(formData, banner._id);
+    console.log(res2.data);
+    resetStates('success', res2.data.msg);
+  };
   // On submit button add new banner or edit exiting one
   const onSubmitForm = async (e) => {
     e.preventDefault();
@@ -64,7 +79,12 @@ const BannerForm = ({
       // if there is a banner._id, it means it's existing banner
       // So it means the action is editing else the action is registering of new banner
       if (banner._id) {
-        const res = await apiEditBanner(banner);
+        const res = await apiEditBanner({
+          _id: banner._id,
+          title: banner.title,
+          duration: banner.duration,
+          sequence: banner.sequence,
+        });
         resetStates('success', res.data.msg);
       } else {
         const formData = new FormData();
@@ -88,7 +108,14 @@ const BannerForm = ({
       onClose={() => setOpenBannerDialog(false)}
       aria-labelledby="form-dialog-title"
     >
-      <BannerPreview bannerPreview={bannerPreview} title={banner.title} />
+      <BannerPreview
+        banner={banner}
+        bannerPreview={bannerPreview}
+        title={banner.title}
+        onInputChange={onChangeBannerImage}
+        isBannerImageEditing={isBannerImageEditing}
+        editBannerImage={editBannerImage}
+      />
 
       <form onSubmit={onSubmitForm}>
         <DialogContent>
@@ -154,6 +181,7 @@ const BannerForm = ({
           <Button
             onClick={() => {
               setBannerPreview(null);
+              setIsIsBannerImageEditing(false);
               setOpenBannerDialog(false);
               setBanner(bannerInitailState);
             }}
