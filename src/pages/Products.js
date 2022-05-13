@@ -60,6 +60,7 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
+// Sorted global filotering of product
 function applySortFilter(array, comparator, query) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -70,10 +71,11 @@ function applySortFilter(array, comparator, query) {
   if (query) {
     return filter(
       array,
-      (_advert) =>
-        _advert.productName.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
-        _advert.brand.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
-        _advert.currentPrice.toString().indexOf(query.toString()) !== -1
+      (_product) =>
+        _product.productName.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+        _product.brand.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+        _product.currentPrice.toString().indexOf(query.toString()) !== -1 ||
+        _product.postType.toLowerCase().indexOf(query.toLowerCase()) !== -1
     );
   }
   return stabilizedThis.map((el) => el[0]);
@@ -90,7 +92,7 @@ export default function Adverts() {
 
   const [orderBy, setOrderBy] = useState('name'); // Order the list of products by
 
-  const [filterName, setFilterName] = useState(''); // Filter products by titile
+  const [filterKeyword, setFilterKeyword] = useState(''); // A string value to filter product
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -126,7 +128,7 @@ export default function Adverts() {
     setSelected([]);
   };
 
-  // Handle the click of checkbox from list of products
+  // Handle click on single row
   const handleClick = (event, _id) => {
     const selectedIndex = selected.indexOf(_id);
     let newSelected = [];
@@ -152,27 +154,28 @@ export default function Adverts() {
     setPage(0);
   };
 
-  const handleFilterByName = (event) => {
-    setFilterName(event.target.value);
+  // Handle global filtering
+  const handleValueForFilter = (event) => {
+    setFilterKeyword(event.target.value);
   };
 
-  // Edit product detail
+  // Approve product for post
   const approveProduct = (product) => {
     alert('Approved successfully!');
   };
 
-  // Delete products detail
+  // Delete product detail
   const deleteAdvert = (product) => {
     alert('Deleted successfully!');
   };
 
-  const getAdvertDetail = (product) => {
+  const routeToProductDetailPage = (product) => {
     alert('Test done!');
   };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - productsList.length) : 0;
 
-  const filteredUsers = applySortFilter(productsList, getComparator(order, orderBy), filterName);
+  const filteredUsers = applySortFilter(productsList, getComparator(order, orderBy), filterKeyword);
 
   const isUserNotFound = filteredUsers.length === 0;
 
@@ -188,8 +191,8 @@ export default function Adverts() {
         <Card>
           <UserListToolbar
             numSelected={selected.length}
-            filterName={filterName}
-            onFilterName={handleFilterByName}
+            filterName={filterKeyword}
+            onFilterName={handleValueForFilter}
             table="product"
           />
 
@@ -256,12 +259,12 @@ export default function Adverts() {
                                 label: 'Detail',
                                 icon: 'fluent:apps-list-detail-24-regular',
                                 color: '#2065D1',
-                                onClick: () => getAdvertDetail(row),
+                                onClick: () => routeToProductDetailPage(row),
                               },
                               {
                                 label: 'Owner',
                                 icon: 'carbon:user-admin',
-                                onClick: () => getAdvertDetail(row),
+                                onClick: () => routeToProductDetailPage(row),
                               },
                               {
                                 label: 'Approve',
@@ -292,7 +295,7 @@ export default function Adverts() {
                   <TableBody>
                     <TableRow>
                       <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                        <SearchNotFound searchQuery={filterName} />
+                        <SearchNotFound searchQuery={filterKeyword} />
                       </TableCell>
                     </TableRow>
                   </TableBody>
