@@ -37,8 +37,9 @@ const TABLE_HEAD = [
   { id: 'brand', label: 'Brand', alignRight: false },
   { id: 'currentPrice', label: 'Price', alignRight: false },
   { id: 'createdAt', label: 'Created At', alignRight: false },
+  { id: 'postType', label: 'Post Type', alignRight: false },
   { id: 'postPayment', label: 'Payment', alignRight: false },
-  { id: '' },
+  { id: '', label: 'Actions', alignRight: true },
 ];
 
 // ----------------------------------------------------------------------
@@ -156,8 +157,8 @@ export default function Adverts() {
   };
 
   // Edit product detail
-  const editAdvert = (product) => {
-    alert('Edited successfully!');
+  const approveProduct = (product) => {
+    alert('Approved successfully!');
   };
 
   // Delete products detail
@@ -206,7 +207,7 @@ export default function Adverts() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { _id, productName, brand, currentPrice, createdAt, postPayment } = row;
+                    const { _id, productName, brand, currentPrice, createdAt, postType, postPayment } = row;
                     const isItemSelected = selected.indexOf(_id) !== -1;
 
                     return (
@@ -225,7 +226,28 @@ export default function Adverts() {
                         <TableCell align="left">{brand}</TableCell>
                         <TableCell align="left">{currentPrice}</TableCell>
                         <TableCell align="left">{fDate(createdAt)}</TableCell>
-                        <TableCell align="left">{postPayment ? 'Done' : 'Unpaid'}</TableCell>
+                        <TableCell align="left">{postType}</TableCell>
+                        <TableCell align="left">
+                          {postPayment ? (
+                            <Iconify
+                              style={{
+                                color: '#04AA6D',
+                              }}
+                              icon="icons8:checked"
+                              width={25}
+                              height={25}
+                            />
+                          ) : (
+                            <Iconify
+                              sx={{
+                                color: '#FF4436',
+                              }}
+                              icon="bi:x-circle"
+                              width={25}
+                              height={25}
+                            />
+                          )}
+                        </TableCell>
 
                         <TableCell align="right">
                           <UserMoreMenu
@@ -240,6 +262,12 @@ export default function Adverts() {
                                 label: 'Owner',
                                 icon: 'carbon:user-admin',
                                 onClick: () => getAdvertDetail(row),
+                              },
+                              {
+                                label: 'Approve',
+                                icon: 'ion:checkmark-done-circle-sharp',
+                                color: '#04AA6D',
+                                onClick: () => approveProduct(row),
                               },
                               {
                                 label: 'Delete',
