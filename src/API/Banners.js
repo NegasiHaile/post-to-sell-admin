@@ -21,7 +21,7 @@ export const apiAddNewBanner = async (data) => {
   });
 };
 
-// Add new banner
+// Edit banner detail
 export const apiEditBanner = async (data) => {
   return await axios.put(
     `${server}/api/banners/edit/${data._id}`,
@@ -32,6 +32,16 @@ export const apiEditBanner = async (data) => {
       },
     }
   );
+};
+
+// Edit banner image
+export const apiEditBannerImage = async (data, id) => {
+  return await axios.put(`${server}/api/banners/edit/banner/${id}`, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      Authorization: accesstoken,
+    },
+  });
 };
 
 // Delete banner (Postcard to beexport const apiGetAllBanners = async () => {
