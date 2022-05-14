@@ -32,7 +32,7 @@ import Toast from '../components/Utils/Toast';
 import { fDate } from '../utils/formatTime';
 
 // API
-import { apiGetAllProducts, apiDeleteProduct, apiApproveProduct } from '../API/index';
+import { apiGetAllProducts, apiDeleteProduct, apiApproveProduct, apiArchiveProduct } from '../API/index';
 
 // ----------------------------------------------------------------------
 const TABLE_HEAD = [
@@ -187,10 +187,15 @@ export default function Adverts() {
   };
 
   // Archive product and limited it from being seen in the public pages
-  const archiveProduct = (product) => {
+  const archiveProduct = async (product) => {
     try {
-      alert('Archived successfully!');
-    } catch (error) {}
+      const res = await apiArchiveProduct(product);
+      funcGetAllProducts();
+      setShowModal(initialShowModal);
+      Toast('sucess', res.data.msg);
+    } catch (error) {
+      Toast('error', error.response.data.msg);
+    }
   };
 
   // Delete product detail
