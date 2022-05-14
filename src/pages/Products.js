@@ -8,7 +8,6 @@ import {
   Card,
   Table,
   Stack,
-  Avatar,
   Button,
   Checkbox,
   TableRow,
@@ -26,12 +25,16 @@ import Scrollbar from '../components/Scrollbar';
 import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
-// functions
-import { fDate } from '../utils/formatTime';
-// API
-import { apiGetAllProducts } from '../API/index';
-// ----------------------------------------------------------------------
+import CustomModal from '../components/Modal';
 
+// Utils
+import Toast from '../components/Utils/Toast';
+import { fDate } from '../utils/formatTime';
+
+// API
+import { apiGetAllProducts, apiDeleteProduct } from '../API/index';
+
+// ----------------------------------------------------------------------
 const TABLE_HEAD = [
   { id: 'productName', label: 'Name', alignRight: false },
   { id: 'brand', label: 'Brand', alignRight: false },
@@ -81,6 +84,16 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
+// Initial values for the modal
+const initialShowModal = {
+  action: '',
+  status: false,
+  title: '',
+  contentText: '',
+  onConfirm: null,
+  isLoading: false,
+};
+
 export default function Adverts() {
   const [page, setPage] = useState(0); // Page of the table
 
@@ -95,6 +108,8 @@ export default function Adverts() {
   const [filterKeyword, setFilterKeyword] = useState(''); // A string value to filter product
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const [showModal, setShowModal] = useState(initialShowModal);
 
   useEffect(() => {
     // Calling get all products function
@@ -164,9 +179,21 @@ export default function Adverts() {
     alert('Approved successfully!');
   };
 
+  // Archive product and limited from being seen in the client products lsit
+  const archiveProduct = (product) => {
+    alert('Archived successfully!');
+  };
+
   // Delete product detail
-  const deleteAdvert = (product) => {
-    alert('Deleted successfully!');
+  const dleteProduct = async (product) => {
+    try {
+      const res = await apiDeleteProduct(product._id);
+      funcGetAllProducts();
+      setShowModal(initialShowModal);
+      Toast('sucess', res.data.msg);
+    } catch (error) {
+      Toast('error', error.response.data.msg);
+    }
   };
 
   const routeToProductDetailPage = (product) => {
@@ -267,16 +294,59 @@ export default function Adverts() {
                                 onClick: () => routeToProductDetailPage(row),
                               },
                               {
-                                label: 'Approve',
-                                icon: 'ion:checkmark-done-circle-sharp',
-                                color: '#04AA6D',
-                                onClick: () => approveProduct(row),
+                                label:
+                                  row?.status === 'new'
+                                    ? 'Approve'
+                                    : row?.status === 'archived'
+                                    ? 'Unarchive'
+                                    : 'Archive',
+                                icon:
+                                  row?.status === 'active'
+                                    ? 'clarity:archive-line'
+                                    : row?.status === 'archived'
+                                    ? 'clarity:unarchive-line'
+                                    : 'akar-icons:chat-approve',
+                                color: row?.status === 'active' ? '#EF9B0F' : '#04AA6D',
+                                onClick: () =>
+                                  setShowModal({
+                                    action:
+                                      row?.status === 'active'
+                                        ? 'Archive'
+                                        : row?.status === 'archived'
+                                        ? 'Unarchive'
+                                        : 'Approve',
+                                    status: true,
+                                    title:
+                                      (row?.status === 'active'
+                                        ? 'Archive'
+                                        : row?.status === 'archived'
+                                        ? 'Unarchive'
+                                        : 'Approve') + ' this?',
+                                    contentText: `Are you sure you want to ${
+                                      row?.status === 'active'
+                                        ? 'archive'
+                                        : row?.status === 'archived'
+                                        ? 'unarchive'
+                                        : 'approve'
+                                    } this product?`,
+                                    onConfirm: () =>
+                                      row?.status === 'active' ? archiveProduct(row) : approveProduct(row),
+                                    isLoading: false,
+                                  }),
                               },
                               {
                                 label: 'Delete',
                                 icon: 'eva:trash-2-outline',
                                 color: '#FF4436',
-                                onClick: () => deleteAdvert(row),
+                                onClick: () =>
+                                  setShowModal({
+                                    action: 'Delete',
+                                    status: true,
+                                    title: 'Delete this?',
+                                    contentText: 'Are you sure you want to delete this post permanently?',
+                                    onConfirm: () => dleteProduct(row),
+                                    isLoading: false,
+                                  }),
                               },
                             ]}
                           />
@@ -314,6 +384,9 @@ export default function Adverts() {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
+
+        {/* Dialog for conformation of an action */}
+        <CustomModal showModal={showModal} setShowModal={setShowModal} />
       </Container>
     </Page>
   );
