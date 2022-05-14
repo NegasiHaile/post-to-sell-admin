@@ -42,6 +42,7 @@ const TABLE_HEAD = [
   { id: 'createdAt', label: 'Created At', alignRight: false },
   { id: 'postType', label: 'Post Type', alignRight: false },
   { id: 'postPayment', label: 'Payment', alignRight: false },
+  { id: 'status', label: 'Status', alignRight: false },
   { id: '', label: 'Actions', alignRight: true },
 ];
 
@@ -251,7 +252,7 @@ export default function Adverts() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { _id, productName, brand, currentPrice, createdAt, postType, postPayment } = row;
+                    const { _id, productName, brand, currentPrice, createdAt, postType, postPayment, status } = row;
                     const isItemSelected = selected.indexOf(_id) !== -1;
 
                     return (
@@ -292,7 +293,18 @@ export default function Adverts() {
                             />
                           )}
                         </TableCell>
-
+                        <TableCell align="left">
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              textTransform: 'capitalize',
+                              color: status === 'new' ? '#EF9B0F' : status === 'active' ? '#04AA6D' : '#FF4436',
+                            }}
+                          >
+                            {' '}
+                            {status}
+                          </Typography>
+                        </TableCell>
                         <TableCell align="right">
                           <UserMoreMenu
                             data={[
