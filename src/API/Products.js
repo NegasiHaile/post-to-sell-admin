@@ -33,3 +33,16 @@ export const apiApproveProduct = async (id) => {
     }
   );
 };
+
+// Archive product
+export const apiArchiveProduct = async (product) => {
+  return await axios.put(
+    `${server}/api/products/archive/${product._id}`,
+    { product },
+    {
+      headers: {
+        Authorization: accesstoken,
+      },
+    }
+  );
+};
