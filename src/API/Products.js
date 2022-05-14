@@ -20,3 +20,16 @@ export const apiDeleteProduct = (id) => {
     },
   });
 };
+
+// Approve product
+export const apiApproveProduct = async (id) => {
+  return await axios.put(
+    `${server}/api/products/approve/${id}`,
+    { id },
+    {
+      headers: {
+        Authorization: accesstoken,
+      },
+    }
+  );
+};
