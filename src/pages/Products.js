@@ -79,7 +79,8 @@ function applySortFilter(array, comparator, query) {
         _product.productName.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
         _product.brand.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
         _product.currentPrice.toString().indexOf(query.toString()) !== -1 ||
-        _product.postType.toLowerCase().indexOf(query.toLowerCase()) !== -1
+        _product.postType.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+        _product.status.toLowerCase().indexOf(query.toLowerCase()) !== -1
     );
   }
   return stabilizedThis.map((el) => el[0]);
