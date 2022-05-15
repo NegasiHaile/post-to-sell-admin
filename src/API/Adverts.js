@@ -37,3 +37,12 @@ export const apiArchiveAdvert = async (advert) => {
     }
   );
 };
+
+// Delete advert
+export const apiDeleteAdvert = async (id) => {
+  return await axios.delete(`${server}/api/adverts/delete/${id}`, {
+    headers: {
+      Authorization: accesstoken,
+    },
+  });
+};

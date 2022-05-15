@@ -32,7 +32,7 @@ import CustomModal from '../components/Modal';
 import Toast from '../components/Utils/Toast';
 import { fDate } from '../utils/formatTime';
 // API
-import { apiGetAllAdverts, apiApproveAdvert, apiArchiveAdvert } from '../API/index';
+import { apiGetAllAdverts, apiApproveAdvert, apiArchiveAdvert, apiDeleteAdvert } from '../API/index';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
@@ -195,7 +195,14 @@ export default function Adverts() {
 
   // Delete advert detail
   const deleteAdvert = async (advert) => {
-    alert('Deleted successfully!');
+    try {
+      const res = await apiDeleteAdvert(advert._id);
+      getAllAdverts();
+      setShowModal(initialShowModal);
+      Toast('sucess', res.data.msg);
+    } catch (error) {
+      Toast('error', error.response.data.msg);
+    }
   };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - advertsList.length) : 0;
