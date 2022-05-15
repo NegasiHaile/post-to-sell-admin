@@ -26,10 +26,13 @@ import Scrollbar from '../components/Scrollbar';
 import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
-// functions
+import CustomModal from '../components/Modal';
+
+// Utils
+import Toast from '../components/Utils/Toast';
 import { fDate } from '../utils/formatTime';
 // API
-import { apiGetAllAdverts } from '../API/index';
+import { apiGetAllAdverts, apiApproveAdvert } from '../API/index';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
@@ -71,6 +74,16 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
+// Initial values for the modal
+const initialShowModal = {
+  action: '',
+  status: false,
+  title: '',
+  contentText: '',
+  onConfirm: null,
+  isLoading: false,
+};
+
 export default function Adverts() {
   const [page, setPage] = useState(0); // Page of the table
 
@@ -85,6 +98,8 @@ export default function Adverts() {
   const [filterName, setFilterName] = useState(''); // Filter adverts by titile
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const [showModal, setShowModal] = useState(initialShowModal);
 
   useEffect(() => {
     // Calling get all adverts function
@@ -148,18 +163,29 @@ export default function Adverts() {
     setFilterName(event.target.value);
   };
 
-  // Edit advert detail
-  const editAdvert = (advert) => {
-    alert('Edited successfully!');
+  //go to advert detail
+  const routeToAdvertDetailPage = (advert) => {
+    alert('Test done!');
   };
 
   // Delete advert detail
-  const deleteAdvert = (advert) => {
-    alert('Deleted successfully!');
+  const approveAdvert = async (advert) => {
+    try {
+      const res = await apiApproveAdvert(advert);
+      getAllAdverts();
+      setShowModal(initialShowModal);
+      Toast('sucess', res.data.msg);
+    } catch (error) {
+      Toast('error', error.response.data.msg);
+    }
   };
-
-  const getAdvertDetail = (advert) => {
-    alert('Test done!');
+  // Delete advert detail
+  const archiveAdvert = async (advert) => {
+    alert('Archived successfully!');
+  };
+  // Delete advert detail
+  const deleteAdvert = async (advert) => {
+    alert('Deleted successfully!');
   };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - advertsList.length) : 0;
@@ -223,22 +249,70 @@ export default function Adverts() {
                           <UserMoreMenu
                             data={[
                               {
-                                label: 'Edit',
-                                icon: 'eva:edit-fill',
-                                color: '#04AA6D',
-                                onClick: () => editAdvert(row),
+                                label: 'Detail',
+                                icon: 'fluent:apps-list-detail-24-regular',
+                                color: '#2065D1',
+                                onClick: () => routeToAdvertDetailPage(row),
+                              },
+                              {
+                                label: 'Owner',
+                                icon: 'carbon:user-admin',
+                                onClick: () => routeToAdvertDetailPage(row),
+                              },
+                              {
+                                label:
+                                  row?.status === 'new'
+                                    ? 'Approve'
+                                    : row?.status === 'archived'
+                                    ? 'Unarchive'
+                                    : 'Archive',
+                                icon:
+                                  row?.status === 'active'
+                                    ? 'clarity:archive-line'
+                                    : row?.status === 'archived'
+                                    ? 'clarity:unarchive-line'
+                                    : 'akar-icons:chat-approve',
+                                color: row?.status === 'active' ? '#EF9B0F' : '#04AA6D',
+                                onClick: () =>
+                                  setShowModal({
+                                    action:
+                                      row?.status === 'active'
+                                        ? 'Archive'
+                                        : row?.status === 'archived'
+                                        ? 'Unarchive'
+                                        : 'Approve',
+                                    status: true,
+                                    title:
+                                      (row?.status === 'active'
+                                        ? 'Archive'
+                                        : row?.status === 'archived'
+                                        ? 'Unarchive'
+                                        : 'Approve') + ' this?',
+                                    contentText: `Are you sure you want to ${
+                                      row?.status === 'active'
+                                        ? 'archive'
+                                        : row?.status === 'archived'
+                                        ? 'unarchive'
+                                        : 'approve'
+                                    } this advert?`,
+                                    onConfirm: () =>
+                                      row?.status === 'active' ? archiveAdvert(row) : approveAdvert(row),
+                                    isLoading: false,
+                                  }),
                               },
                               {
                                 label: 'Delete',
                                 icon: 'eva:trash-2-outline',
                                 color: '#FF4436',
-                                onClick: () => deleteAdvert(row),
-                              },
-                              {
-                                label: 'Detail',
-                                icon: 'fluent:apps-list-detail-24-regular',
-                                color: '#2065D1',
-                                onClick: () => getAdvertDetail(row),
+                                onClick: () =>
+                                  setShowModal({
+                                    action: 'Delete',
+                                    status: true,
+                                    title: 'Delete this?',
+                                    contentText: 'Are you sure you want to delete this advert permanently?',
+                                    onConfirm: () => deleteAdvert(row),
+                                    isLoading: false,
+                                  }),
                               },
                             ]}
                           />
@@ -276,6 +350,9 @@ export default function Adverts() {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
+
+        {/* Dialog for conformation of an action */}
+        <CustomModal showModal={showModal} setShowModal={setShowModal} />
       </Container>
     </Page>
   );
