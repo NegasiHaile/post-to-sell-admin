@@ -253,7 +253,27 @@ export default function Adverts() {
                         <TableCell align="left">{title}</TableCell>
                         <TableCell align="left">{type}</TableCell>
                         <TableCell align="left">{fDate(createdAt)}</TableCell>
-                        <TableCell align="left">{advertPayment ? 'Done' : 'Unpaid'}</TableCell>
+                        <TableCell align="left">
+                          {advertPayment ? (
+                            <Iconify
+                              style={{
+                                color: '#04AA6D',
+                              }}
+                              icon="icons8:checked"
+                              width={25}
+                              height={25}
+                            />
+                          ) : (
+                            <Iconify
+                              sx={{
+                                color: '#FF4436',
+                              }}
+                              icon="bi:x-circle"
+                              width={25}
+                              height={25}
+                            />
+                          )}
+                        </TableCell>
                         <TableCell align="left">
                           <Typography
                             variant="subtitle2"
