@@ -32,7 +32,7 @@ import CustomModal from '../components/Modal';
 import Toast from '../components/Utils/Toast';
 import { fDate } from '../utils/formatTime';
 // API
-import { apiGetAllAdverts, apiApproveAdvert } from '../API/index';
+import { apiGetAllAdverts, apiApproveAdvert, apiArchiveAdvert } from '../API/index';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
@@ -168,7 +168,7 @@ export default function Adverts() {
     alert('Test done!');
   };
 
-  // Delete advert detail
+  // Approve advert detail
   const approveAdvert = async (advert) => {
     try {
       const res = await apiApproveAdvert(advert);
@@ -179,10 +179,19 @@ export default function Adverts() {
       Toast('error', error.response.data.msg);
     }
   };
-  // Delete advert detail
+
+  // Archive advert detail
   const archiveAdvert = async (advert) => {
-    alert('Archived successfully!');
+    try {
+      const res = await apiArchiveAdvert(advert);
+      getAllAdverts();
+      setShowModal(initialShowModal);
+      Toast('sucess', res.data.msg);
+    } catch (error) {
+      Toast('error', error.response.data.msg);
+    }
   };
+
   // Delete advert detail
   const deleteAdvert = async (advert) => {
     alert('Deleted successfully!');

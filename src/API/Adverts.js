@@ -24,3 +24,16 @@ export const apiApproveAdvert = async (advert) => {
     }
   );
 };
+
+// Archive advert
+export const apiArchiveAdvert = async (advert) => {
+  return await axios.put(
+    `${server}/api/adverts/archive/${advert._id}`,
+    { advert },
+    {
+      headers: {
+        Authorization: accesstoken,
+      },
+    }
+  );
+};
