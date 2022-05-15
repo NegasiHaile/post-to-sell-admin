@@ -40,6 +40,7 @@ const TABLE_HEAD = [
   { id: 'type', label: 'Type', alignRight: false },
   { id: 'createdAt', label: 'Created At', alignRight: false },
   { id: 'advertPayment', label: 'Payment', alignRight: false },
+  { id: 'status', label: 'Status', alignRight: false },
   { id: '' },
 ];
 
@@ -234,7 +235,7 @@ export default function Adverts() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { _id, title, type, createdAt, advertPayment } = row;
+                    const { _id, title, type, createdAt, advertPayment, status } = row;
                     const isItemSelected = selected.indexOf(_id) !== -1;
 
                     return (
@@ -253,6 +254,18 @@ export default function Adverts() {
                         <TableCell align="left">{type}</TableCell>
                         <TableCell align="left">{fDate(createdAt)}</TableCell>
                         <TableCell align="left">{advertPayment ? 'Done' : 'Unpaid'}</TableCell>
+                        <TableCell align="left">
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              textTransform: 'capitalize',
+                              color: status === 'new' ? '#EF9B0F' : status === 'active' ? '#04AA6D' : '#FF4436',
+                            }}
+                          >
+                            {' '}
+                            {status}
+                          </Typography>
+                        </TableCell>
 
                         <TableCell align="right">
                           <UserMoreMenu
