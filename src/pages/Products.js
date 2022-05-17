@@ -8,7 +8,6 @@ import {
   Card,
   Table,
   Stack,
-  Avatar,
   Button,
   Checkbox,
   TableRow,
@@ -26,19 +25,25 @@ import Scrollbar from '../components/Scrollbar';
 import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
-// functions
-import { fDate } from '../utils/formatTime';
-// API
-import { apiGetAllProducts } from '../API/index';
-// ----------------------------------------------------------------------
+import CustomModal from '../components/Modal';
 
+// Utils
+import Toast from '../components/Utils/Toast';
+import { fDate } from '../utils/formatTime';
+
+// API
+import { apiGetAllProducts, apiDeleteProduct, apiApproveProduct, apiArchiveProduct } from '../API/index';
+
+// ----------------------------------------------------------------------
 const TABLE_HEAD = [
   { id: 'productName', label: 'Name', alignRight: false },
   { id: 'brand', label: 'Brand', alignRight: false },
   { id: 'currentPrice', label: 'Price', alignRight: false },
   { id: 'createdAt', label: 'Created At', alignRight: false },
+  { id: 'postType', label: 'Post Type', alignRight: false },
   { id: 'postPayment', label: 'Payment', alignRight: false },
-  { id: '' },
+  { id: 'status', label: 'Status', alignRight: false },
+  { id: '', label: 'Actions', alignRight: true },
 ];
 
 // ----------------------------------------------------------------------
@@ -59,6 +64,7 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
+// Sorted global filotering of product
 function applySortFilter(array, comparator, query) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -69,14 +75,26 @@ function applySortFilter(array, comparator, query) {
   if (query) {
     return filter(
       array,
-      (_advert) =>
-        _advert.productName.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
-        _advert.brand.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
-        _advert.currentPrice.toString().indexOf(query.toString()) !== -1
+      (_product) =>
+        _product.productName.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+        _product.brand.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+        _product.currentPrice.toString().indexOf(query.toString()) !== -1 ||
+        _product.postType.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+        _product.status.toLowerCase().indexOf(query.toLowerCase()) !== -1
     );
   }
   return stabilizedThis.map((el) => el[0]);
 }
+
+// Initial values for the modal
+const initialShowModal = {
+  action: '',
+  status: false,
+  title: '',
+  contentText: '',
+  onConfirm: null,
+  isLoading: false,
+};
 
 export default function Adverts() {
   const [page, setPage] = useState(0); // Page of the table
@@ -89,9 +107,11 @@ export default function Adverts() {
 
   const [orderBy, setOrderBy] = useState('name'); // Order the list of products by
 
-  const [filterName, setFilterName] = useState(''); // Filter products by titile
+  const [filterKeyword, setFilterKeyword] = useState(''); // A string value to filter product
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const [showModal, setShowModal] = useState(initialShowModal);
 
   useEffect(() => {
     // Calling get all products function
@@ -125,7 +145,7 @@ export default function Adverts() {
     setSelected([]);
   };
 
-  // Handle the click of checkbox from list of products
+  // Handle click on single row
   const handleClick = (event, _id) => {
     const selectedIndex = selected.indexOf(_id);
     let newSelected = [];
@@ -151,27 +171,54 @@ export default function Adverts() {
     setPage(0);
   };
 
-  const handleFilterByName = (event) => {
-    setFilterName(event.target.value);
+  // Handle global filtering
+  const handleValueForFilter = (event) => {
+    setFilterKeyword(event.target.value);
   };
 
-  // Edit product detail
-  const editAdvert = (product) => {
-    alert('Edited successfully!');
+  // Approve product for post
+  const approveProduct = async (product) => {
+    try {
+      const res = await apiApproveProduct(product._id);
+      funcGetAllProducts();
+      setShowModal(initialShowModal);
+      Toast('sucess', res.data.msg);
+    } catch (error) {
+      Toast('error', error.response.data.msg);
+    }
   };
 
-  // Delete products detail
-  const deleteAdvert = (product) => {
-    alert('Deleted successfully!');
+  // Archive product and limited it from being seen in the public pages
+  const archiveProduct = async (product) => {
+    try {
+      const res = await apiArchiveProduct(product);
+      funcGetAllProducts();
+      setShowModal(initialShowModal);
+      Toast('sucess', res.data.msg);
+    } catch (error) {
+      Toast('error', error.response.data.msg);
+    }
   };
 
-  const getAdvertDetail = (product) => {
+  // Delete product detail
+  const dleteProduct = async (product) => {
+    try {
+      const res = await apiDeleteProduct(product._id);
+      funcGetAllProducts();
+      setShowModal(initialShowModal);
+      Toast('sucess', res.data.msg);
+    } catch (error) {
+      Toast('error', error.response.data.msg);
+    }
+  };
+
+  const routeToProductDetailPage = (product) => {
     alert('Test done!');
   };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - productsList.length) : 0;
 
-  const filteredUsers = applySortFilter(productsList, getComparator(order, orderBy), filterName);
+  const filteredUsers = applySortFilter(productsList, getComparator(order, orderBy), filterKeyword);
 
   const isUserNotFound = filteredUsers.length === 0;
 
@@ -187,8 +234,8 @@ export default function Adverts() {
         <Card>
           <UserListToolbar
             numSelected={selected.length}
-            filterName={filterName}
-            onFilterName={handleFilterByName}
+            filterName={filterKeyword}
+            onFilterName={handleValueForFilter}
             table="product"
           />
 
@@ -206,7 +253,7 @@ export default function Adverts() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { _id, productName, brand, currentPrice, createdAt, postPayment } = row;
+                    const { _id, productName, brand, currentPrice, createdAt, postType, postPayment, status } = row;
                     const isItemSelected = selected.indexOf(_id) !== -1;
 
                     return (
@@ -225,8 +272,40 @@ export default function Adverts() {
                         <TableCell align="left">{brand}</TableCell>
                         <TableCell align="left">{currentPrice}</TableCell>
                         <TableCell align="left">{fDate(createdAt)}</TableCell>
-                        <TableCell align="left">{postPayment ? 'Done' : 'Unpaid'}</TableCell>
-
+                        <TableCell align="left">{postType}</TableCell>
+                        <TableCell align="left">
+                          {postPayment ? (
+                            <Iconify
+                              style={{
+                                color: '#04AA6D',
+                              }}
+                              icon="icons8:checked"
+                              width={25}
+                              height={25}
+                            />
+                          ) : (
+                            <Iconify
+                              sx={{
+                                color: '#FF4436',
+                              }}
+                              icon="bi:x-circle"
+                              width={25}
+                              height={25}
+                            />
+                          )}
+                        </TableCell>
+                        <TableCell align="left">
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              textTransform: 'capitalize',
+                              color: status === 'new' ? '#EF9B0F' : status === 'active' ? '#04AA6D' : '#FF4436',
+                            }}
+                          >
+                            {' '}
+                            {status}
+                          </Typography>
+                        </TableCell>
                         <TableCell align="right">
                           <UserMoreMenu
                             data={[
@@ -234,18 +313,67 @@ export default function Adverts() {
                                 label: 'Detail',
                                 icon: 'fluent:apps-list-detail-24-regular',
                                 color: '#2065D1',
-                                onClick: () => getAdvertDetail(row),
+                                onClick: () => routeToProductDetailPage(row),
                               },
                               {
                                 label: 'Owner',
                                 icon: 'carbon:user-admin',
-                                onClick: () => getAdvertDetail(row),
+                                onClick: () => routeToProductDetailPage(row),
+                              },
+                              {
+                                label:
+                                  row?.status === 'new'
+                                    ? 'Approve'
+                                    : row?.status === 'archived'
+                                    ? 'Unarchive'
+                                    : 'Archive',
+                                icon:
+                                  row?.status === 'active'
+                                    ? 'clarity:archive-line'
+                                    : row?.status === 'archived'
+                                    ? 'clarity:unarchive-line'
+                                    : 'akar-icons:chat-approve',
+                                color: row?.status === 'active' ? '#EF9B0F' : '#04AA6D',
+                                onClick: () =>
+                                  setShowModal({
+                                    action:
+                                      row?.status === 'active'
+                                        ? 'Archive'
+                                        : row?.status === 'archived'
+                                        ? 'Unarchive'
+                                        : 'Approve',
+                                    status: true,
+                                    title:
+                                      (row?.status === 'active'
+                                        ? 'Archive'
+                                        : row?.status === 'archived'
+                                        ? 'Unarchive'
+                                        : 'Approve') + ' this?',
+                                    contentText: `Are you sure you want to ${
+                                      row?.status === 'active'
+                                        ? 'archive'
+                                        : row?.status === 'archived'
+                                        ? 'unarchive'
+                                        : 'approve'
+                                    } this product?`,
+                                    onConfirm: () =>
+                                      row?.status === 'active' ? archiveProduct(row) : approveProduct(row),
+                                    isLoading: false,
+                                  }),
                               },
                               {
                                 label: 'Delete',
                                 icon: 'eva:trash-2-outline',
                                 color: '#FF4436',
-                                onClick: () => deleteAdvert(row),
+                                onClick: () =>
+                                  setShowModal({
+                                    action: 'Delete',
+                                    status: true,
+                                    title: 'Delete this?',
+                                    contentText: 'Are you sure you want to delete this post permanently?',
+                                    onConfirm: () => dleteProduct(row),
+                                    isLoading: false,
+                                  }),
                               },
                             ]}
                           />
@@ -264,7 +392,7 @@ export default function Adverts() {
                   <TableBody>
                     <TableRow>
                       <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                        <SearchNotFound searchQuery={filterName} />
+                        <SearchNotFound searchQuery={filterKeyword} />
                       </TableCell>
                     </TableRow>
                   </TableBody>
@@ -283,6 +411,9 @@ export default function Adverts() {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
+
+        {/* Dialog for conformation of an action */}
+        <CustomModal showModal={showModal} setShowModal={setShowModal} />
       </Container>
     </Page>
   );
