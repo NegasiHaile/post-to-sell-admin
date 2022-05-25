@@ -1,21 +1,24 @@
 import { Navigate, useRoutes } from 'react-router-dom';
 // layouts
-import DashboardLayout from './layouts/dashboard';
-//
-import Adverts from './pages/Adverts';
-import User from './pages/User';
+// Public pages
 import Login from './pages/Login';
 import NotFound from './pages/Page404';
 
+// Private pages
+import DashboardLayout from './layouts/dashboard';
+import Adverts from './pages/Adverts';
+import User from './pages/User';
 import Products from './pages/Products';
 import Categories from './pages/Categories';
+import AddCategory from './pages/AddCategory';
 import DashboardApp from './pages/DashboardApp';
 import ProductsList from './components/users/UserProducts';
 import Banners from './pages/Banners';
 
-//
+// Data from local storage
 const access = localStorage.getItem('accesstoken');
 const refresh = localStorage.getItem('refreshtoken');
+
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -30,6 +33,7 @@ export default function Router() {
               { path: 'user', element: <User /> },
               { path: 'products', element: <Products /> },
               { path: 'categories', element: <Categories /> },
+              { path: 'add_category', element: <AddCategory /> },
               { path: 'adverts', element: <Adverts /> },
               { path: 'banners', element: <Banners /> },
               { path: 'user/list-products/:id', element: <ProductsList /> },
