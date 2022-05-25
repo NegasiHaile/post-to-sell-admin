@@ -1,103 +1,35 @@
-// Sample data of categories
-export const categories = [
+// Static hirarchy category-subCategory-brand-model
+const categories = [
   // vehicle category
   {
-    _id: '625e97c9a9945b1b8b8a30c5',
+    _id: 1,
     category: 'Vehicle',
     subCategory: [
       {
-        list_name: 'car',
-        nest_name: 'brand',
-        nest_list: [
+        sub_name: 'car',
+        brand: [
           {
-            list_name: 'tesla',
-            nest_name: 'model',
-            nest_list: [
-              { list_name: 'model X', nest_name: null, nest_list: [] },
-              { list_name: 'model Y', nest_name: null, nest_list: [] },
-              { list_name: 'model 3', nest_name: null, nest_list: [] },
-            ],
+            brand_name: 'tesla',
+            model: ['model X', 'model 3'],
           },
           {
-            list_name: 'mercedes',
-            nest_name: 'model',
-            nest_list: [
-              { list_name: 'B class', nest_name: null, nest_list: [] },
-              { list_name: 'C class', nest_name: null, nest_list: [] },
-              { list_name: 'CLA', nest_name: null, nest_list: [] },
-            ],
+            brand_name: 'mercedes',
+            model: ['B class', 'C class', 'CLA'],
           },
         ],
       },
       {
-        list_name: 'truck',
-        nest_name: 'brand',
-        nest_list: [
+        sub_name: 'truck',
+        brand: [
           {
             list_name: 'iveco',
-            nest_name: 'model',
-            nest_list: [
-              {
-                list_name: 'astira',
-                nest_name: 'type',
-                nest_list: [
-                  { list_name: 'single', nest_name: null, nest_list: [] },
-                  { list_name: 'double', nest_name: null, nest_list: [] },
-                ],
-              },
-              {
-                list_name: 'magirus',
-                nest_name: null,
-                nest_list: [],
-              },
-            ],
+            model: ['astira', 'magirus'],
           },
         ],
       },
     ],
+    createdAt: '2022-04-19T11:06:49.562Z',
     description: 'All vehicle type under post to sell',
     categoryImage: 'uploads/category/9823842398hsahjk90rwey32.jpg',
-    createdAt: '2022-04-19T11:06:49.562Z',
-  },
-
-  // Fashion category
-  {
-    _id: '625e97c9a9945b1b8b8a30c2',
-    category: 'Fashion',
-    subCategory: [
-      {
-        list_name: 'men',
-        nest_name: 'brand',
-        nest_list: [
-          {
-            list_name: 'nike',
-            nest_name: 'type',
-            nest_list: [
-              {
-                list_name: 't-shirt',
-                nest_name: 'size',
-                nest_list: [
-                  { list_name: 'small', nest_name: null, nest_list: [] },
-                  { list_name: 'medium', nest_name: null, nest_list: [] },
-                  { list_name: 'large', nest_name: null, nest_list: [] },
-                ],
-              },
-              {
-                list_name: 'hoodie',
-                nest_name: 'size',
-                nest_list: [
-                  { list_name: 'small', nest_name: null, nest_list: [] },
-                  { list_name: 'medium', nest_name: null, nest_list: [] },
-                  { list_name: 'large', nest_name: null, nest_list: [] },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-    description: 'All fashions like men, women and kids fashions.',
-    categoryImage: 'uploads/category/9823842398hsahjk90rwey32.jpg',
-    createdAt: '2022-04-19T11:06:49.562Z',
   },
 ];
