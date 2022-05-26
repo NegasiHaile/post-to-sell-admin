@@ -119,7 +119,7 @@ export default function Categories() {
     try {
       const res = await apiGetAllCategories();
       console.log(res.data);
-      setProductsList(categories);
+      setProductsList(res.data);
       console.log(categories);
     } catch (error) {
       alert(error.response.data.msg);
@@ -280,15 +280,11 @@ export default function Categories() {
                         </TableCell>
                         <TableCell align="left">{category}</TableCell>
                         <TableCell align="left">
-                          {subCategory.length && (
-                            <ul>
-                              {subCategory.map((sub, index) => (
-                                // <li>
-                                <SubCategory key={index} complete_data={sub} />
-                                // </li>
-                              ))}
-                            </ul>
-                          )}
+                          <ul>
+                            {subCategory.map((item, index) => (
+                              <li key={index}>{item}</li>
+                            ))}
+                          </ul>
                         </TableCell>
                         <TableCell align="left">{fDate(createdAt)}</TableCell>
                         <TableCell align="right">
