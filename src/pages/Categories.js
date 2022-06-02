@@ -8,7 +8,7 @@ import { filter } from 'lodash';
 import { categories } from '../_mock/categories';
 // APIs
 import { apiGetAllCategories } from '../API/index'; // API
-import { apiDeleteProduct, apiApproveProduct, apiArchiveProduct } from '../API/index';
+import { apiDeleteCategoryDetail, apiApproveProduct, apiArchiveProduct } from '../API/index';
 
 // material
 import {
@@ -198,20 +198,20 @@ export default function Categories() {
     }
   };
 
-  // Delete product detail
-  const dleteProduct = async (product) => {
+  // Delete category detail
+  const deleteCategory = async (category) => {
     try {
-      const res = await apiDeleteProduct(product._id);
+      const res = await apiDeleteCategoryDetail(category._id);
       funcGetAllCategories();
       setShowModal(initialShowModal);
       Toast('sucess', res.data.msg);
     } catch (error) {
-      Toast('error', error.response.data.msg);
+      Toast('error', error.response);
     }
   };
 
-  const routeToProductDetailPage = (product) => {
-    alert('Test done!');
+  const routeToProductDetailPage = (category) => {
+    navigate(`/dashboard/edit_category/${category._id}`);
   };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - productsList.length) : 0;
@@ -282,7 +282,7 @@ export default function Categories() {
                         <TableCell align="left">
                           <ul>
                             {subCategory.map((item, index) => (
-                              <li key={index}>{item}</li>
+                              <li key={index}>{item.sub_name}</li>
                             ))}
                           </ul>
                         </TableCell>
@@ -311,8 +311,8 @@ export default function Categories() {
                                     action: 'Delete',
                                     status: true,
                                     title: 'Delete this?',
-                                    contentText: 'Are you sure you want to delete this post permanently?',
-                                    onConfirm: () => dleteProduct(row),
+                                    contentText: 'Are you sure you want to delete this category permanently?',
+                                    onConfirm: () => deleteCategory(row),
                                     isLoading: false,
                                   }),
                               },
@@ -328,7 +328,6 @@ export default function Categories() {
                     </TableRow>
                   )}
                 </TableBody>
-
                 {isCategoryNotFound && (
                   <TableBody>
                     <TableRow>

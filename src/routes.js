@@ -34,6 +34,7 @@ export default function Router() {
               { path: 'products', element: <Products /> },
               { path: 'categories', element: <Categories /> },
               { path: 'add_category', element: <AddCategory /> },
+              { path: 'edit_category/:id', element: <AddCategory /> },
               { path: 'adverts', element: <Adverts /> },
               { path: 'banners', element: <Banners /> },
               { path: 'user/list-products/:id', element: <ProductsList /> },
