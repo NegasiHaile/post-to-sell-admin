@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+// Redux
+import { useSelector, useDispatch } from 'react-redux';
+import { setCategory, selectedCategory } from '../Redux/Actions/CategoryActions';
+
 //Node_Modules
 import { filter } from 'lodash';
 
-// Mocks
-import { categories } from '../_mock/categories';
 // APIs
 import { apiGetAllCategories } from '../API/index'; // API
 import { apiDeleteCategoryDetail, apiApproveProduct, apiArchiveProduct } from '../API/index';
@@ -28,22 +30,23 @@ import {
 
 // Developer components
 import Page from '../components/Page';
-import Label from '../components/Label';
 import Scrollbar from '../components/Scrollbar';
 import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
 import CustomModal from '../components/Modal';
-import SubCategory from '../components/Category/SubCategory';
 
 // Developer utils
-import Toast from '../components/Utils/Toast';
 import { fDate } from '../utils/formatTime';
 
+// Toastify
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // ----------------------------------------------------------------------
 const TABLE_HEAD = [
   { id: 'category', label: 'Category Name', alignRight: false },
   { id: 'subCategory', label: 'Sub Cutegories', alignRight: false },
+  { id: 'postFee', label: 'Post Fee', alignRight: false },
   { id: 'createdAt', label: 'Created At', alignRight: false },
   { id: '', label: 'Actions', alignRight: true },
 ];
@@ -91,6 +94,10 @@ const initialShowModal = {
 };
 
 export default function Categories() {
+  const ctgrys = useSelector((state) => state.category);
+  const dispatch = useDispatch();
+  console.log(ctgrys);
+
   const navigate = useNavigate();
 
   const [page, setPage] = useState(0); // Pagenation of the table
@@ -118,11 +125,10 @@ export default function Categories() {
   const funcGetAllCategories = async () => {
     try {
       const res = await apiGetAllCategories();
-      console.log(res.data);
       setProductsList(res.data);
-      console.log(categories);
+      dispatch(setCategory(res.data));
     } catch (error) {
-      alert(error.response.data.msg);
+      console.log(error.response.data.msg);
     }
   };
 
@@ -174,39 +180,15 @@ export default function Categories() {
     setFilterKeyword(event.target.value);
   };
 
-  // Approve product for post
-  const approveProduct = async (product) => {
-    try {
-      const res = await apiApproveProduct(product._id);
-      funcGetAllCategories();
-      setShowModal(initialShowModal);
-      Toast('sucess', res.data.msg);
-    } catch (error) {
-      Toast('error', error.response.data.msg);
-    }
-  };
-
-  // Archive product and limited it from being seen in the public pages
-  const archiveProduct = async (product) => {
-    try {
-      const res = await apiArchiveProduct(product);
-      funcGetAllCategories();
-      setShowModal(initialShowModal);
-      Toast('sucess', res.data.msg);
-    } catch (error) {
-      Toast('error', error.response.data.msg);
-    }
-  };
-
   // Delete category detail
   const deleteCategory = async (category) => {
     try {
       const res = await apiDeleteCategoryDetail(category._id);
       funcGetAllCategories();
       setShowModal(initialShowModal);
-      Toast('sucess', res.data.msg);
+      toast.success(res.data.msg);
     } catch (error) {
-      Toast('error', error.response);
+      toast.error(error.response.data.msg);
     }
   };
 
@@ -225,7 +207,8 @@ export default function Categories() {
   };
 
   return (
-    <Page title="Products">
+    <Page title="Categories">
+      <ToastContainer position="bottom-right" />
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
@@ -263,7 +246,7 @@ export default function Categories() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { _id, category, subCategory, createdAt } = row;
+                    const { _id, category, subCategory, postFee, createdAt } = row;
                     const isItemSelected = selected.indexOf(_id) !== -1;
 
                     return (
@@ -280,12 +263,11 @@ export default function Categories() {
                         </TableCell>
                         <TableCell align="left">{category}</TableCell>
                         <TableCell align="left">
-                          <ul>
-                            {subCategory.map((item, index) => (
-                              <li key={index}>{item.sub_name}</li>
-                            ))}
-                          </ul>
+                          {subCategory.map((item, index) => (
+                            <span key={index}>{item.sub_name} , </span>
+                          ))}
                         </TableCell>
+                        <TableCell align="left">{postFee ? postFee + ' ETB' : ''} </TableCell>
                         <TableCell align="left">{fDate(createdAt)}</TableCell>
                         <TableCell align="right">
                           <UserMoreMenu
@@ -300,7 +282,10 @@ export default function Categories() {
                                 label: 'Edit',
                                 icon: 'eva:edit-fill',
                                 color: '#04AA6D',
-                                onClick: () => routeToProductDetailPage(row),
+                                onClick: () => {
+                                  dispatch(selectedCategory(row));
+                                  routeToProductDetailPage(row);
+                                },
                               },
                               {
                                 label: 'Delete',

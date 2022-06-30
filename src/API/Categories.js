@@ -25,6 +25,18 @@ export const apiGetAllCategories = async () => {
   return await axios.get(`${server}/api/categories/list`);
 };
 
+// Edit category detail
+export const apiEditCategoryDetail = async (id, data) => {
+  return await axios.put(
+    `${server}/api/categories/edit/${id}`,
+    { ...data },
+    {
+      headers: {
+        Authorization: accesstoken,
+      },
+    }
+  );
+};
 // Edit category image
 export const apiEditCategoryImage = async (categoryId, formData) => {
   return await axios.put(`${server}/api/categories/edit/image/${categoryId}`, formData, {
