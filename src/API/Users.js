@@ -1,7 +1,14 @@
-import axios from "axios";
+import axios from 'axios';
 
 // Server base url
-import { server } from "../Constants/Server_Base_URL";
+import { server } from '../Constants/Server_Base_URL';
+
+// Refresh token
+export const apiRefreshToken = async (refreshToken) => {
+  return await axios.post(`${server}/api/users/refresh_token`, {
+    token: refreshToken,
+  });
+};
 
 // login for admin only
 export const apiAdminSignin = (credintials) => {

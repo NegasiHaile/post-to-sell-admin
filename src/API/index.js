@@ -1,5 +1,5 @@
 // Collecting all APIs in to this file
-import { apiAdminSignin, api_getAllUserProducts } from './Users'; // users APIs
+import { apiRefreshToken, apiAdminSignin, api_getAllUserProducts } from './Users'; // users APIs
 import {
   apiAddCategory,
   apiGetAllCategories,
@@ -12,7 +12,7 @@ import { apiGetAllAdverts, apiApproveAdvert, apiArchiveAdvert, apiDeleteAdvert }
 import { apiGetAllBanners, apiAddNewBanner, apiEditBanner, apiEditBannerImage, apiDeleteBanner } from './Banners'; // Banners API
 
 // Exporting all the APIs
-export { apiAdminSignin, api_getAllUserProducts }; // users
+export { apiRefreshToken, apiAdminSignin, api_getAllUserProducts }; // users
 export { apiAddCategory, apiGetAllCategories, apiEditCategoryDetail, apiEditCategoryImage, apiDeleteCategoryDetail }; // categories
 export { apiGetAllProducts, apiDeleteProduct, apiApproveProduct, apiArchiveProduct }; // Products
 export { apiGetAllAdverts, apiApproveAdvert, apiArchiveAdvert, apiDeleteAdvert }; // Adverts
