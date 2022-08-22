@@ -46,7 +46,8 @@ import 'react-toastify/dist/ReactToastify.css';
 const TABLE_HEAD = [
   { id: 'category', label: 'Category Name', alignRight: false },
   { id: 'subCategory', label: 'Sub Cutegories', alignRight: false },
-  { id: 'postFee', label: 'Post Fee', alignRight: false },
+  { id: 'postFee', label: 'Normal Post Fee', alignRight: false },
+  { id: 'featuredPostFee', label: 'Featured Post Fee', alignRight: false },
   { id: 'createdAt', label: 'Created At', alignRight: false },
   { id: '', label: 'Actions', alignRight: true },
 ];
@@ -246,7 +247,7 @@ export default function Categories() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { _id, category, subCategory, postFee, createdAt } = row;
+                    const { _id, category, subCategory, postFee, featuredPostFee, createdAt } = row;
                     const isItemSelected = selected.indexOf(_id) !== -1;
 
                     return (
@@ -268,6 +269,7 @@ export default function Categories() {
                           ))}
                         </TableCell>
                         <TableCell align="left">{postFee ? postFee + ' ETB' : ''} </TableCell>
+                        <TableCell align="left">{featuredPostFee ? featuredPostFee + ' ETB' : 'Not set'} </TableCell>
                         <TableCell align="left">{fDate(createdAt)}</TableCell>
                         <TableCell align="right">
                           <UserMoreMenu

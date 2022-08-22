@@ -42,6 +42,7 @@ const initialStateCategory = {
   description: '',
   categoryImage: '',
   postFee: '',
+  featuredPostFee: '',
 };
 
 const CategoryForm = () => {
@@ -224,6 +225,7 @@ const CategoryForm = () => {
       if (categoryIdOnEdit) {
         // Edit category API request
         const res = await apiEditCategoryDetail(categoryIdOnEdit, category);
+        navigate(`/dashboard/categories`);
         toast.success(res.data.msg);
       } else {
         var formData = new FormData();
@@ -232,6 +234,7 @@ const CategoryForm = () => {
         const categoryId = res.data.detail._id;
         const res1 = await apiEditCategoryImage(categoryId, formData);
         setCategory(initialStateCategory);
+        navigate(`/dashboard/categories`);
         toast.success(res.data.msg);
       }
     } catch (error) {
@@ -409,21 +412,36 @@ const CategoryForm = () => {
         ))}
         <Grid xs={12} borderBottom="1px solid #cdcdcd" marginLeft="11px"></Grid>
         <Grid container spacing={2}>
-          <Grid item xs={categoryIdOnEdit ? 12 : 6} md={categoryIdOnEdit ? 12 : 6}>
+          <Grid item xs={6} md={categoryIdOnEdit ? 6 : 4}>
             <FormControl sx={{ m: 1, width: '100%' }}>
               <TextField
+                type="number"
                 name="postFee"
                 value={category.postFee}
                 onChange={(e) => setCategory({ ...category, postFee: e.target.value })}
                 size="small"
-                label="Post Fee"
+                label="Normal post fee"
                 required={true}
                 placeholder="10 ETB"
               />
             </FormControl>
           </Grid>
+          <Grid item xs={6} md={categoryIdOnEdit ? 6 : 4}>
+            <FormControl sx={{ m: 1, width: '100%' }}>
+              <TextField
+                type="number"
+                name="featuredPostFee"
+                value={category.featuredPostFee}
+                onChange={(e) => setCategory({ ...category, featuredPostFee: e.target.value })}
+                size="small"
+                label="Featured post fee"
+                required={true}
+                placeholder="50 ETB"
+              />
+            </FormControl>
+          </Grid>
           {!categoryIdOnEdit && (
-            <Grid item xs={6} md={6}>
+            <Grid item xs={12} md={4}>
               <FormControl sx={{ m: 1, width: '100%' }}>
                 <TextField
                   type="file"
@@ -469,52 +487,3 @@ const CategoryForm = () => {
 };
 
 export default CategoryForm;
-
-const brandItem = (brnd, bi) => {
-  return (
-    <FormControl key={bi} size="small" sx={{ m: 1 }} variant="outlined">
-      <InputLabel htmlFor={`sob_01${bi}`}>{`Sub 0${bi + 1}`}</InputLabel>
-      <OutlinedInput
-        id={`sob_01${bi}`}
-        type={'text'}
-        name={brnd.brand_name}
-        value={brnd.brand_name + bi}
-        label={`brnad 0${bi + 1}`}
-      />
-    </FormControl>
-  );
-};
-//  const ctgry = {
-//    name: '',
-//    subCategories: [
-//      { id: '0', list_name: '', nest_list: [] },
-//      {
-//        id: '1',
-//        list_name: '',
-//        nest_list: [
-//          {
-//            id: '1.0',
-//            list_name: '',
-//            nest_list: [
-//              { id: '1.0.0', list_name: '', nest_list: [] },
-//              { id: '1.0.1', list_name: '', nest_list: [] },
-//            ],
-//          },
-//          { id: '1.1', list_name: '', nest_list: [] },
-//        ],
-//      },
-//    ],
-//  };
-
-//  function deepSplice(array, indices, deleteCount, ...toBeInserted) {
-//    const last = indices.pop();
-//    console.log('last' + last);
-//    const finalItems = indices.reduce((acc, i) => acc[i].nest_list, array);
-//    finalItems.push({ ...initialNestList, id: '1.1.1' });
-//    console.log(ctgry);
-//    return array;
-//  }
-//  console.log(
-//    // removes "1.0.1" item and inserts a new object there
-//    deepSplice(ctgry.subCategories, [1, 0, 1], 1, { id: '1.0.1', name: 'the last object' })
-//  );
